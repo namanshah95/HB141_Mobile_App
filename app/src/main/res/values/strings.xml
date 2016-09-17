@@ -1,8 +1,12 @@
 <resources>
-    <string name="app_name">HB141</string>
+    <string name="app_name_string">HB141</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open_string">Open navigation drawer</string>
+    <string name="navigation_drawer_close_string">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
+    <string name="action_settings_string">Settings</string>
+
+    <!-- Nav Header -->
+    <string name="nav_header_maintitle_string">First Last</string>
+    <string name="nav_header_subtitle_string">userid</string>
 </resources>
