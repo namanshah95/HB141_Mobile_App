@@ -1,12 +1,21 @@
 <resources>
-    <string name="app_name_string">HB141</string>
+    <!-- App -->
+    <string name="app_name_string" translatable="false">HB141</string>
 
+    <!-- Drawer Header -->
+    <string name="nav_header_maintitle_string" translatable="false">First Last</string>
+    <string name="nav_header_subtitle_string" translatable="false">userid | 100 Points</string>
+
+    <!-- Drawer -->
     <string name="navigation_drawer_open_string">Open navigation drawer</string>
     <string name="navigation_drawer_close_string">Close navigation drawer</string>
+    <string name="nav_chooselocation_string">Choose Location</string>
+    <string name="nav_prevreports_string">Previous Reports</string>
+    <string name="nav_moreinfo_string">More Information</string>
+    <string name="nav_settings_string">Settings</string>
 
+    <!-- Menu -->
     <string name="action_settings_string">Settings</string>
-
-    <!-- Nav Header -->
-    <string name="nav_header_maintitle_string">First Last</string>
-    <string name="nav_header_subtitle_string">userid</string>
+    <string name="title_activity_inspect">Inspect HB141 Compliance</string>
+    <string name="title_activity_report">Compose Report</string>
 </resources>
