@@ -1,5 +1,6 @@
 package com.binitshah.hb141;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -66,6 +67,8 @@ public class MainActivity extends AppCompatActivity
             ft.replace(R.id.content_frame_id, new MapsFragment());
             ft.commit();
         }
+
+        startActivity(new Intent(this, OnboardingActivity.class));
     }
 
     @Override

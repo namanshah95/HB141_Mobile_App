@@ -28,7 +28,9 @@
                 android:value="com.binitshah.hb141.MainActivity" />
         </activity>
         <activity android:name=".LoginActivity" />
-        <activity android:name=".OnboardingActivity"></activity>
+        <activity android:name=".OnboardingActivity">
+
+        </activity>
     </application>
 
 </manifest>
