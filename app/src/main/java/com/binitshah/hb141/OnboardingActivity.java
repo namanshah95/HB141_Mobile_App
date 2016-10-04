@@ -17,6 +17,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import me.relex.circleindicator.CircleIndicator;
@@ -36,6 +37,10 @@ public class OnboardingActivity extends FragmentActivity {
     private int previousPage;
     private float modPosition;
 
+    //Nav Control
+    private Button prevButton;
+    private Button nextButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +57,27 @@ public class OnboardingActivity extends FragmentActivity {
         thisColor = ContextCompat.getColor(this ,R.color.colorOnboarding1);
         nextColor = ContextCompat.getColor(this ,R.color.colorOnboarding2);
         relativeLayout.setBackgroundColor(thisColor);
+
+        prevButton = (Button) findViewById(R.id.backwards_button);
+        prevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mPager.getCurrentItem() != 0) {
+                    mPager.setCurrentItem(mPager.getCurrentItem() - 1, true);
+                }
+            }
+        });
+        prevButton.setVisibility(View.GONE);
+
+        nextButton = (Button) findViewById(R.id.forward_button);
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mPager.getCurrentItem() != 6){
+                    mPager.setCurrentItem(mPager.getCurrentItem() + 1, true);
+                }
+            }
+        });
 
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -77,7 +103,14 @@ public class OnboardingActivity extends FragmentActivity {
             }
 
             @Override
-            public void onPageSelected(int position) {}
+            public void onPageSelected(int position) {
+                if(position != 0){
+                    prevButton.setVisibility(View.VISIBLE);
+                }
+                else {
+                    prevButton.setVisibility(View.GONE);
+                }
+            }
 
             @Override
             public void onPageScrollStateChanged(int state) {}
@@ -89,7 +122,7 @@ public class OnboardingActivity extends FragmentActivity {
      * sequence.
      */
     private class OnboardingPagerAdapter extends FragmentStatePagerAdapter {
-        private final int NUM_PAGES = 4;
+        private final int NUM_PAGES = 7;
 
         public OnboardingPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -100,17 +133,11 @@ public class OnboardingActivity extends FragmentActivity {
 
         @Override
         public Fragment getItem(int position) {
-            switch (position) {
-                case 0:
-                    return OnboardingFragment.newInstance(1);
-                case 1:
-                    return OnboardingFragment.newInstance(2);
-                case 2:
-                    return OnboardingFragment.newInstance(3);
-                case 3:
-                    return OnboardingFragment.newInstance(4);
-                default:
-                    return OnboardingFragment.newInstance(5);
+            if(position <= 6){
+                return OnboardingFragment.newInstance(position);
+            }
+            else{
+                return OnboardingFragment.newInstance(1);
             }
         }
     }

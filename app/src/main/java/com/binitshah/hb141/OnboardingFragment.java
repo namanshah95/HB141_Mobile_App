@@ -9,17 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnboardingFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link OnboardingFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class OnboardingFragment extends Fragment {
 
     /**
@@ -29,9 +24,16 @@ public class OnboardingFragment extends Fragment {
      * @return A new instance of fragment OnboardingFragment.
      */
 
-    public static OnboardingFragment newInstance(int position) {
+    private int position;
+
+    public static OnboardingFragment newInstance(int positionHolder) {
         OnboardingFragment fragment = new OnboardingFragment();
+        fragment.setPosition(positionHolder);
         return fragment;
+    }
+
+    public void setPosition(int positionHolder){
+        position = positionHolder;
     }
 
     public OnboardingFragment() {
@@ -48,6 +50,32 @@ public class OnboardingFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_onboarding, container, false);
+        switch (position) {
+            case 0:
+                RelativeLayout relativeLayout1 = (RelativeLayout) rootView.findViewById(R.id.onboarding_page1);
+                relativeLayout1.setVisibility(View.VISIBLE);
+                break;
+            case 1:
+                RelativeLayout relativeLayout2 = (RelativeLayout) rootView.findViewById(R.id.onboarding_page2);
+                relativeLayout2.setVisibility(View.VISIBLE);
+                break;
+            case 2:
+                RelativeLayout relativeLayout3 = (RelativeLayout) rootView.findViewById(R.id.onboarding_page3);
+                relativeLayout3.setVisibility(View.VISIBLE);
+                break;
+            case 3:
+                RelativeLayout relativeLayout4 = (RelativeLayout) rootView.findViewById(R.id.onboarding_page4);
+                relativeLayout4.setVisibility(View.VISIBLE);
+                break;
+            case 4:
+                RelativeLayout relativeLayout5 = (RelativeLayout) rootView.findViewById(R.id.onboarding_page5);
+                relativeLayout5.setVisibility(View.VISIBLE);
+                break;
+            case 5:
+                RelativeLayout relativeLayout6 = (RelativeLayout) rootView.findViewById(R.id.onboarding_page6);
+                relativeLayout6.setVisibility(View.VISIBLE);
+                break;
+        }
         return rootView;
     }
 

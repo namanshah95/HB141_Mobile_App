@@ -19,6 +19,21 @@
     <string name="title_activity_inspect">Inspect HB141 Compliance</string>
     <string name="title_activity_report">Compose Report</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Image Content Descriptions -->
+    <string name="image_descrip_logo">HB141 Logo</string>
+
+    <!-- Onboarding Screens -->
+    <string name="body_page2">Although slavery is commonly thought to be a thing of the past, human traffickers generate hundreds of billions of dollars in profits by trapping millions of people in horrific situations around the world, including here in the U.S. Traffickers use violence, threats, deception, debt bondage, and other manipulative tactics to force people to engage in commercial sex or to provide labor or services against their will.</string>
+    <string name="body_page3">While more research is needed on the scope of human trafficking, below are a few key statistics: The International Labour Organization estimates that there are 20.9 million victims of human trafficking globally.</string>
+    <string name="page3_fact1">68% of them are in forced labor.</string>
+    <string name="page3_fact2">26% of them are children.</string>
+    <string name="page3_fact3">55% are women and girls.</string>
+    <string name="source">Polaris Project - https://polarisproject.org/facts</string>
+    <string name="body_page4">In the US, House Bill 141 exists to reduce human trafficking.</string>
+    <string name="body_page4_title">HB141:</string>
+    <string name="body_page4_bullet1">- States that certain establishments are required to post the human trafficking hotline on a notice in their location to enable people who are the subject of human trafficking to find help.</string>
+    <string name="body_page4_bullet2">- Affects establishments that give overnight stay, serve alcohol, or provide entertainment of the sexual nature.</string>
+    <string name="body_page4_bullet3">- Affects farms that hire from labour contractors.</string>
+    <string name="body_page4_bill">House Bill 141 (Kidnapping; certain businesses and establishments post a model notice to enable persons who are the subject of human trafficking to obtain help and services) was passed during the 2013 session of the General Assembly and signed into law by Governor Nathan Deal on May 6, 2013 as O.C.G.A. 16&#8211;5&#8211;47.  The new law requires certain businesses and establishments to post a notice to enable persons who are the subject of human trafficking to obtain help and services.  The law also directs the Georgia Bureau of Investigation to post a model notice on its website.  A link to the model notice is provided below.  The businesses and establishments specified in the law are required to have the notice posted in a specified location by September 15, 2013.  If a business or establishment fails to comply with the law, law enforcement can take action which, upon subsequent offenses, could result in the business or establishment owner being fined up to $5,000.</string>
+
 </resources>

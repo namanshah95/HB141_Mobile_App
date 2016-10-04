@@ -1,14 +1,249 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.binitshah.hb141.OnboardingFragment"
-    android:orientation="vertical"
-    android:id="@+id/linear_layout">
+    android:padding="16dp">
 
-    <TextView
-        android:textColor="@android:color/white"
-        android:layout_height="match_parent"
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/onboarding_page1"
         android:layout_width="match_parent"
-        android:id="@+id/content_text" />
-</LinearLayout>
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/image_ihti"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logoihti"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp"
+            android:contentDescription="@string/image_descrip_logo"/>
+
+        <ImageView
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logoncchr"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:layout_below="@+id/image_ihti"
+            android:contentDescription="@string/image_descrip_logo"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/onboarding_page2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/image_smallihti"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logoihtismall"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:contentDescription="@string/image_descrip_logo"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/image_smallihti"
+            android:text="@string/body_page2"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/onboarding_page3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@id/image_smallihti"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logoihtismall"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:contentDescription="@string/image_descrip_logo"/>
+
+        <TextView
+            android:id="@+id/body_page3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/image_smallihti"
+            android:text="@string/body_page3"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"/>
+
+        <TextView
+            android:id="@+id/page3_fact1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/body_page3"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/page3_fact1"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"/>
+
+        <TextView
+            android:id="@+id/page3_fact2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/page3_fact1"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/page3_fact2"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"/>
+
+        <TextView
+            android:id="@+id/page3_fact3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/page3_fact2"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/page3_fact3"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"/>
+
+        <TextView
+            android:id="@+id/source"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/page3_fact3"
+            android:layout_marginTop="30dp"
+            android:text="@string/source"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="15sp"
+            android:textColor="@android:color/white"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/onboarding_page4"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@id/image_smallihti"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logoihtismall"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:contentDescription="@string/image_descrip_logo"/>
+
+        <TextView
+            android:id="@+id/body_page4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/image_smallihti"
+            android:text="@string/body_page4"
+            android:fontFamily="sans-serif-condensed"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"/>
+
+        <TextView
+            android:id="@+id/body_page4_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/body_page4"
+            android:text="@string/body_page4_title"
+            android:fontFamily="sans-serif"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"/>
+
+        <ScrollView
+            android:layout_below="@+id/body_page4_title"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:padding="16dp"
+            android:layout_marginBottom="80dp"
+            android:background="@color/colorBackground">
+
+            <TextView
+                android:id="@+id/body_page4_bill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/body_page4_bill"
+                android:fontFamily="sans-serif"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:textColor="@color/colorText"/>
+
+        </ScrollView>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/onboarding_page5"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@id/image_ihti"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logoihti"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp"
+            android:contentDescription="@string/image_descrip_logo"/>
+
+        <ImageView
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logoncchr"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:layout_below="@+id/image_ihti"
+            android:contentDescription="@string/image_descrip_logo"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/onboarding_page6"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@id/image_ihti"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logoihti"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp"
+            android:contentDescription="@string/image_descrip_logo"/>
+
+        <ImageView
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logoncchr"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:layout_below="@+id/image_ihti"
+            android:contentDescription="@string/image_descrip_logo"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>
