@@ -20,7 +20,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
-import me.relex.circleindicator.CircleIndicator;
 
 /*
 * OnboardingActivity provides the onboarding experience.
