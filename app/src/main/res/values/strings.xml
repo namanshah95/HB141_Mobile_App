@@ -2,6 +2,9 @@
     <!-- App -->
     <string name="app_name_string" translatable="false">HB141</string>
 
+    <!-- API KEY -->
+    <string name="google_key" translatable="false">AIzaSyD4gRyvK9hdDtk4kXHeSrFXY3AEU94LN28</string>
+
     <!-- Drawer Header -->
     <string name="nav_header_maintitle_string" translatable="false">First Last</string>
     <string name="nav_header_subtitle_string" translatable="false">userid | 100 Points</string>
