@@ -39,7 +39,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.binitshah.hb141.MainActivity" />
         </activity>
-        <activity android:name=".LoginActivity" />
         <activity android:name=".OnboardingActivity"></activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -52,10 +51,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-
-        <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
 
         <fragment
             class="com.google.android.gms.maps.MapFragment"
