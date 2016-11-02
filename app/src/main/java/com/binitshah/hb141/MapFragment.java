@@ -1,10 +1,14 @@
 package com.binitshah.hb141;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +17,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -34,6 +39,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     //Places API
     Context context;
     protected GoogleApiClient mGoogleApiClient;
+    protected LatLng mLastLocation;
 
     //Maps API
     MapView mMapView;
@@ -74,7 +80,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                 googleMap.setBuildingsEnabled(true);
                 final LatLngBounds NEWENGLAND = new LatLngBounds(
                         new LatLng(41, -73), new LatLng(47, -68));
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(33.762909, -84.422675), 6)); //defaults to atlanta
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastLocation, 6)); //defaults to atlanta
             }
         });
 
@@ -119,15 +125,29 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                 .Builder(context)
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
+                .addApi(LocationServices.API)
                 .enableAutoManage(getActivity(), this)
                 .build();
     }
 
 
     //callbacks for the googleapiclient
+//    @Override
+//    public void onConnected(@Nullable Bundle bundle){
+//        Log.d(LOG, "CONNECTION CONNECTED");
+//    }
+
     @Override
-    public void onConnected(@Nullable Bundle bundle){
-        Log.d(LOG, "CONNECTION CONNECTED");
+    public void onConnected(Bundle connectionHint) {
+        Location lastLocation = null;
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            lastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+        }
+        if (lastLocation != null) {
+            mLastLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+        }
     }
 
     @Override
@@ -138,6 +158,16 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.d(LOG, "CONNECTION FAILED: " + connectionResult.getErrorMessage());
+    }
+
+    public void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    public void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
     }
 }
 
