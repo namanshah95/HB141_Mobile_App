@@ -4,9 +4,15 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -17,6 +23,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -26,6 +34,8 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+
+import static android.content.Context.LOCATION_SERVICE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,6 +55,16 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     MapView mMapView;
     GoogleMap googleMap;
 
+    //Locations API
+    private Location mLocation;
+    private LocationManager locationManager;
+    private LocationRequest mLocationRequest;
+
+    //Location
+    LocationManager mLocationManager;
+    long TIME = 10000; //every ten seconds
+    float DISTANCE = 3; //every three meters
+    private static final int PERMISSION_REQUEST_CODE = 1;
 
     public MapFragment() {
         // Required empty public constructor
@@ -57,8 +77,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 
         //this segment will initialize the mapview
@@ -78,9 +97,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                 googleMap = readyMap;
                 googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 googleMap.setBuildingsEnabled(true);
-                final LatLngBounds NEWENGLAND = new LatLngBounds(
-                        new LatLng(41, -73), new LatLng(47, -68));
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mLastLocation, 6)); //defaults to atlanta
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(33.762909, -84.422675), 6)); //defaults to atlanta
             }
         });
 
@@ -88,7 +105,70 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
         buildGoogleApiClient();
 
 
+        mLocationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
+
+        if(!checkLocationPermission()) {
+            Log.d(LOG, "GPS Location: " + checkLocationPermission());
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSION_REQUEST_CODE);
+        }
+        else{
+            Log.d(LOG, "GPS Location: " + checkLocationPermission());
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME, DISTANCE, mLocationListener);
+        }
+
+
+
         return v;
+    }
+
+    private boolean checkLocationPermission() {
+        int permissionCheckFine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+        int permissionCheckCoarse = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+        return permissionCheckFine == PackageManager.PERMISSION_GRANTED || permissionCheckCoarse == PackageManager.PERMISSION_GRANTED;
+    }
+
+    //Location
+    LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(final Location location) {
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 14));
+        }
+
+        @Override
+        public void onStatusChanged(String string, int someint, Bundle bundle){
+
+        }
+
+        @Override
+        public void onProviderEnabled(String string){
+
+        }
+
+        @Override
+        public void onProviderDisabled(String string){
+
+        }
+    };
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        Log.d(LOG,"Request Code: " + requestCode);
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted
+                    if(checkLocationPermission()) {
+                        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME, DISTANCE, mLocationListener);
+                    }
+                }
+            }
+        }
     }
 
     //callbacks for the maps api and googleapiclient
@@ -132,22 +212,9 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
 
 
     //callbacks for the googleapiclient
-//    @Override
-//    public void onConnected(@Nullable Bundle bundle){
-//        Log.d(LOG, "CONNECTION CONNECTED");
-//    }
-
     @Override
-    public void onConnected(Bundle connectionHint) {
-        Location lastLocation = null;
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            lastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    mGoogleApiClient);
-        }
-        if (lastLocation != null) {
-            mLastLocation = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-        }
+    public void onConnected(@Nullable Bundle bundle){
+        Log.d(LOG, "CONNECTION CONNECTED");
     }
 
     @Override
