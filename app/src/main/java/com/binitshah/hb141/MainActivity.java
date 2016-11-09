@@ -163,6 +163,9 @@ public class MainActivity extends AppCompatActivity
             if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
                 if (resultCode == RESULT_OK) {
                     Place place = PlaceAutocomplete.getPlace(this, data);
+                    MapFragment fragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
+                    fragment.updateMapViewPort(place.getViewport());
+
     //                Log.i(TAG, "Place: " + place.getName());
                 } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                     Status status = PlaceAutocomplete.getStatus(this, data);
