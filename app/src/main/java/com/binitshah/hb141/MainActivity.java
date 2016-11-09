@@ -14,11 +14,18 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     Toolbar toolbar;
     boolean hideMenu = false;
+    private int PLACE_AUTOCOMPLETE_REQUEST_CODE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,11 +143,36 @@ public class MainActivity extends AppCompatActivity
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.search_location:
-                //insert intent to launch the places searcher activity here
+                PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+                try {
+                    Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).build(this);
+                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                } catch (GooglePlayServicesRepairableException e) {
+                    //TODO: Handle Error
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    //TODO: Handle exception
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+                if (resultCode == RESULT_OK) {
+                    Place place = PlaceAutocomplete.getPlace(this, data);
+    //                Log.i(TAG, "Place: " + place.getName());
+                } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                    Status status = PlaceAutocomplete.getStatus(this, data);
+                    // TODO: Handle the error.
+    //                Log.i(TAG, status.getStatusMessage());
+    
+                } else if (resultCode == RESULT_CANCELED) {
+                    // The user canceled the operation.
+                }
+            }
+        }
 
 }
