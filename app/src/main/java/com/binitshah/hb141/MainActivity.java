@@ -11,12 +11,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     Toolbar toolbar;
+    boolean hideMenu = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,8 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame_id, new PreviousReportsFragment());
             ft.commit();
+            hideMenu = true;
+            invalidateOptionsMenu();
         }
         else if(returningFrom.equals("settings")){
             //set the fragment to Settings
@@ -55,6 +59,8 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame_id, new SettingsFragment());
             ft.commit();
+            hideMenu = true;
+            invalidateOptionsMenu();
         }
         else {
             //default is to set the fragment to Maps Fragment
@@ -63,6 +69,8 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame_id, new MapFragment());
             ft.commit();
+            hideMenu = false;
+            invalidateOptionsMenu();
         }
         startActivity(new Intent(this, OnboardingActivity.class));
     }
@@ -85,14 +93,18 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_chooselocation_id) {
             toolbar.setTitle(getResources().getString(R.string.nav_chooselocation_string));
+            hideMenu = false;
             fragment = new MapFragment();
         } else if (id == R.id.nav_prevreports_id) {
+            hideMenu = true;
             toolbar.setTitle(getResources().getString(R.string.nav_prevreports_string));
             fragment = new PreviousReportsFragment();
         } else if (id == R.id.nav_moreinfo_id) {
+            hideMenu = true;
             toolbar.setTitle(getResources().getString(R.string.nav_moreinfo_string));
             fragment = new InfoFragment();
         } else if (id == R.id.nav_settings_id) {
+            hideMenu = true;
             toolbar.setTitle(getResources().getString(R.string.nav_settings_string));
             fragment = new SettingsFragment();
         }
@@ -101,10 +113,21 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame_id, fragment);
             ft.commit();
+            invalidateOptionsMenu();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_id);
         drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        if(hideMenu){
+            menu.getItem(0).setVisible(false);
+        }
         return true;
     }
 

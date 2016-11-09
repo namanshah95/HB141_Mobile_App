@@ -19,6 +19,7 @@
 
     <!-- Menu -->
     <string name="action_settings_string">Settings</string>
+    <string name="action_search_string">Search</string>
     <string name="title_activity_inspect">Inspect HB141 Compliance</string>
     <string name="title_activity_report">Compose Report</string>
 
