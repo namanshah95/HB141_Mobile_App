@@ -131,4 +131,16 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.search_location:
+                //insert intent to launch the places searcher activity here
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 }
