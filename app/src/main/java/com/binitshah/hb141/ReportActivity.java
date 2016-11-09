@@ -6,6 +6,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Toast;
+
 /*
 * ReportActivity can be started two ways. In either read mode or write mode.
  * In write mode, ReportActivity allows users to fill out a survey on the location and file the report.
@@ -22,10 +24,18 @@ public class ReportActivity extends AppCompatActivity {
         setContentView(R.layout.activity_report);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if(mode.equals("write")){
+
+        }
+        else if(mode.equals("read")){
+
+        }
+        else {
+            Toast.makeText(this, "Report Activity was not set to either read or write. We apologize for the error.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
 }

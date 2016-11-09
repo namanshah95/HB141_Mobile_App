@@ -136,7 +136,7 @@ public class OnboardingActivity extends FragmentActivity {
                 return OnboardingFragment.newInstance(position);
             }
             else{
-                return OnboardingFragment.newInstance(1);
+                return new LoginFragment();
             }
         }
     }

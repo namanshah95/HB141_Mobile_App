@@ -191,6 +191,8 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     public void onDestroy(){
         super.onDestroy();
         mMapView.onDestroy();
+        mGoogleApiClient.stopAutoManage(getActivity());
+        mGoogleApiClient.disconnect();
     }
 
     @Override
