@@ -200,23 +200,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@id/image_ihti"
-            android:layout_width="250dp"
+        <EditText
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/logoihti"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="50dp"
-            android:contentDescription="@string/image_descrip_logo"/>
+            android:inputType="textEmailAddress"
+            android:ems="10"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="57dp"
+            android:layout_marginTop="40dp"
+            android:id="@+id/emailField"
+            android:hint="Email" />
 
-        <ImageView
-            android:layout_width="250dp"
+        <EditText
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/logoncchr"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:layout_below="@+id/emailField"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="26dp"
+            android:id="@+id/passwordField"
+            android:hint="Password" />
+
+        <Button
+            android:text="Sign In"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/passwordField"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
-            android:layout_below="@+id/image_ihti"
-            android:contentDescription="@string/image_descrip_logo"/>
+            android:layout_marginTop="31dp"
+            android:id="@+id/signInButton" />
 
     </RelativeLayout>
 
@@ -245,5 +259,8 @@
             android:contentDescription="@string/image_descrip_logo"/>
 
     </RelativeLayout>
+
+
+
 
 </RelativeLayout>

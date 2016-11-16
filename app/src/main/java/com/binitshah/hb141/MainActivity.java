@@ -13,12 +13,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -26,6 +28,8 @@ public class MainActivity extends AppCompatActivity
     Toolbar toolbar;
     boolean hideMenu = false;
     private int PLACE_AUTOCOMPLETE_REQUEST_CODE;
+
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +48,15 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        boolean loggedIn = true; //todo modify by checking the SharedPreference for whether the user has been logged in or maybe Firebase will provide it.
+        mAuth = FirebaseAuth.getInstance();
+
+
+        //boolean loggedIn = true; //todo modify by checking the SharedPreference for whether the user has been logged in or maybe Firebase will provide it.
         String returningFrom = "nothing"; //todo modify by checking the Intent for an extraString value
-        if(!loggedIn){ //check if the person is logged in
+        if(mAuth.getCurrentUser() == null){ //check if the person is logged in
             //todo send the user through the onboarding/login process
-        }
-        else if(returningFrom.equals("prevreports")){
+            startActivity(new Intent(this, OnboardingActivity.class));
+        } else if(returningFrom.equals("prevreports")){
             //set the fragment to Previous Reports
             toolbar.setTitle(getResources().getString(R.string.nav_prevreports_string));
             navigationView.setCheckedItem(R.id.nav_prevreports_id);
@@ -79,7 +86,11 @@ public class MainActivity extends AppCompatActivity
             hideMenu = false;
             invalidateOptionsMenu();
         }
-        startActivity(new Intent(this, OnboardingActivity.class));
+
+        if (mAuth.getCurrentUser() != null) {
+            TextView subtitle = (TextView) navigationView.getHeaderView(0).findViewById((R.id.nav_header_subtitle_id));
+            subtitle.setText(mAuth.getCurrentUser().getEmail());
+        }
     }
 
     @Override
