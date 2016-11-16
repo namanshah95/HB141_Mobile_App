@@ -9,7 +9,8 @@
     android:paddingStart="@dimen/activity_vertical_margin"
     android:paddingEnd="@dimen/activity_vertical_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    android:id="@+id/nav_header_main_id">
 
     <ImageView
         android:id="@+id/nav_header_propic_id"

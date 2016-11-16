@@ -1,8 +1,10 @@
 package com.binitshah.hb141;
 
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -12,13 +14,25 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 
 /*
@@ -39,6 +53,10 @@ public class OnboardingActivity extends FragmentActivity {
     //Nav Control
     private Button prevButton;
     private Button nextButton;
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +132,12 @@ public class OnboardingActivity extends FragmentActivity {
             @Override
             public void onPageScrollStateChanged(int state) {}
         });
+
+
+
     }
+
+
 
     /**
      * A simple pager adapter that represents 4 OnboardingFragment objects, in
@@ -140,6 +163,8 @@ public class OnboardingActivity extends FragmentActivity {
             }
         }
     }
+
+
 
     public void changeColors(int position){
         previousPage = position;
@@ -193,6 +218,8 @@ public class OnboardingActivity extends FragmentActivity {
                 nextColor = ContextCompat.getColor(getApplicationContext(), R.color.colorTransparent);
                 break;
         }
+
+
     }
 
     private int blendColors(int from, int to, float ratio) {

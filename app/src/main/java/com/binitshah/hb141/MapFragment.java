@@ -105,6 +105,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
             @Override
             public void onMapReady(GoogleMap readyMap) {
                 googleMap = readyMap;
+                System.out.println("Map is ready");
                 googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 googleMap.setBuildingsEnabled(true);
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(33.762909, -84.422675), 6)); //defaults to atlanta
@@ -218,7 +219,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
                 .addApi(LocationServices.API)
-                .enableAutoManage(getActivity(), this)
+                //.enableAutoManage(getActivity(), this)
                 .build();
     }
 
@@ -240,44 +241,23 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     }
 
     public void onStart() {
-        mGoogleApiClient.connect();
         super.onStart();
+        if (mGoogleApiClient != null)
+            mGoogleApiClient.connect();
     }
 
     public void onStop() {
-        mGoogleApiClient.disconnect();
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
         super.onStop();
     }
 
-//    public void search(View view) {
-//        PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
-//        try {
-//            Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).build(this);
-//            startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-//        } catch (GooglePlayServicesRepairableException e) {
-//            //TODO: Handle Error
-//        } catch (GooglePlayServicesNotAvailableException e) {
-//            //TODO: Handle exception
-//        }
-//
-//    }
+    public void updateMapViewPort(LatLngBounds latLng) {
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLng, 0));
+    }
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
-//            if (resultCode == RESULT_OK) {
-//                Place place = PlaceAutocomplete.getPlace(this, data);
-////                Log.i(TAG, "Place: " + place.getName());
-//            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
-//                Status status = PlaceAutocomplete.getStatus(this, data);
-//                // TODO: Handle the error.
-////                Log.i(TAG, status.getStatusMessage());
-//
-//            } else if (resultCode == RESULT_CANCELED) {
-//                // The user canceled the operation.
-//            }
-//        }
-//    }
+
 
 }
 

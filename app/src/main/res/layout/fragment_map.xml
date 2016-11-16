@@ -2,7 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.binitshah.hb141.MapFragment">
+    tools:context="com.binitshah.hb141.MapFragment"
+    android:id="@+id/map_fragment">
+
 
     <com.google.android.gms.maps.MapView
         xmlns:android="http://schemas.android.com/apk/res/android"

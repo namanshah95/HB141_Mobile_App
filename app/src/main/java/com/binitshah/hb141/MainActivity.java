@@ -1,6 +1,7 @@
 package com.binitshah.hb141;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -10,22 +11,39 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, DetailFragment.OnFragmentInteractionListener {
 
     Toolbar toolbar;
     boolean hideMenu = false;
     private int PLACE_AUTOCOMPLETE_REQUEST_CODE;
+
+    //Firebase Variables
+    private DatabaseReference mDatabase;
+
+    private FirebaseAuth mAuth;
+
+    private Place place;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +51,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mAuth = FirebaseAuth.getInstance();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_id);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -44,10 +64,11 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        boolean loggedIn = true; //todo modify by checking the SharedPreference for whether the user has been logged in or maybe Firebase will provide it.
+        //boolean loggedIn = true; //todo modify by checking the SharedPreference for whether the user has been logged in or maybe Firebase will provide it.
         String returningFrom = "nothing"; //todo modify by checking the Intent for an extraString value
-        if(!loggedIn){ //check if the person is logged in
+        if(mAuth.getCurrentUser() == null){ //check if the person is logged in
             //todo send the user through the onboarding/login process
+            startActivity(new Intent(this, OnboardingActivity.class));
         }
         else if(returningFrom.equals("prevreports")){
             //set the fragment to Previous Reports
@@ -79,7 +100,10 @@ public class MainActivity extends AppCompatActivity
             hideMenu = false;
             invalidateOptionsMenu();
         }
-        startActivity(new Intent(this, OnboardingActivity.class));
+        if (mAuth.getCurrentUser() != null) {
+            TextView subtitle = (TextView) navigationView.getHeaderView(0).findViewById((R.id.nav_header_subtitle_id));
+            subtitle.setText(mAuth.getCurrentUser().getEmail());
+        }
     }
 
     @Override
@@ -162,8 +186,22 @@ public class MainActivity extends AppCompatActivity
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
             if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
                 if (resultCode == RESULT_OK) {
-                    Place place = PlaceAutocomplete.getPlace(this, data);
-    //                Log.i(TAG, "Place: " + place.getName());
+                    place = PlaceAutocomplete.getPlace(this, data);
+
+                    // Initialize Firebase Database Reference
+                    mDatabase = FirebaseDatabase.getInstance().getReference();
+
+                    mDatabase.child("establishment").child(place.getId()).child("Name").setValue(place.getName().toString());
+                    mDatabase.child("establishment").child(place.getId()).child("Address").setValue(place.getAddress().toString());
+                    mDatabase.child("establishment").child(place.getId()).child("Phone Number").setValue(place.getPhoneNumber().toString());
+                    mDatabase.child("establishment").child(place.getId()).child("Website").setValue(place.getWebsiteUri().toString());
+                    mDatabase.child("establishment").child(place.getId()).child("Place Type").setValue(place.getPlaceTypes());
+
+
+
+                    //MapFragment fragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
+                    //fragment.updateMapViewPort(place.getViewport());
+
                 } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                     Status status = PlaceAutocomplete.getStatus(this, data);
                     // TODO: Handle the error.
@@ -175,4 +213,27 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        if (place != null) {
+            toolbar.setTitle(place.getName().toString());
+
+            Bundle bundle = new Bundle();
+            bundle.putString("eid", place.getId());
+            DetailFragment detailFragment = new DetailFragment();
+            detailFragment.setArguments(bundle);
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame_id, detailFragment);
+            ft.commit();
+            hideMenu = true;
+            invalidateOptionsMenu();
+        }
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
 }
