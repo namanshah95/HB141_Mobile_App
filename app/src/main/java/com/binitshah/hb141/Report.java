@@ -9,10 +9,12 @@ import java.util.List;
 public class Report {
 
     List<Integer> placeTypes;
-    String name;
     String placeId;
-    String address;
+    String volunteerId;
     String dateVisited;
+    boolean public_view;
+    boolean restroom_view;
+    boolean no_view;
 
 
     public Report(){

@@ -216,7 +216,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
                 .addApi(LocationServices.API)
-                .enableAutoManage(getActivity(), this)
+                //.enableAutoManage(getActivity(), this)
                 .build();
     }
 
@@ -238,12 +238,15 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     }
 
     public void onStart() {
-        mGoogleApiClient.connect();
         super.onStart();
+        if (mGoogleApiClient != null)
+            mGoogleApiClient.connect();
     }
 
     public void onStop() {
-        mGoogleApiClient.disconnect();
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
         super.onStop();
     }
 
