@@ -1,6 +1,7 @@
 package com.binitshah.hb141;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -31,7 +32,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, DetailFragment.OnFragmentInteractionListener {
 
     Toolbar toolbar;
     boolean hideMenu = false;
@@ -39,9 +40,10 @@ public class MainActivity extends AppCompatActivity
 
     //Firebase Variables
     private DatabaseReference mDatabase;
-    private String mUserId;
 
     private FirebaseAuth mAuth;
+
+    private Place place;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,7 +186,7 @@ public class MainActivity extends AppCompatActivity
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
             if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
                 if (resultCode == RESULT_OK) {
-                    Place place = PlaceAutocomplete.getPlace(this, data);
+                    place = PlaceAutocomplete.getPlace(this, data);
 
                     // Initialize Firebase Database Reference
                     mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -193,10 +195,11 @@ public class MainActivity extends AppCompatActivity
                     mDatabase.child("establishment").child(place.getId()).child("Address").setValue(place.getAddress().toString());
                     mDatabase.child("establishment").child(place.getId()).child("Phone Number").setValue(place.getPhoneNumber().toString());
                     mDatabase.child("establishment").child(place.getId()).child("Website").setValue(place.getWebsiteUri().toString());
-                    mDatabase.child("establishment").child(place.getId()).child("Place Type").setValue(place.getPlaceTypes().toString());
+                    mDatabase.child("establishment").child(place.getId()).child("Place Type").setValue(place.getPlaceTypes());
 
 
-                    // /MapFragment fragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
+
+                    //MapFragment fragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
                     //fragment.updateMapViewPort(place.getViewport());
 
                 } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
@@ -210,4 +213,27 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        if (place != null) {
+            toolbar.setTitle(place.getName().toString());
+
+            Bundle bundle = new Bundle();
+            bundle.putString("eid", place.getId());
+            DetailFragment detailFragment = new DetailFragment();
+            detailFragment.setArguments(bundle);
+
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame_id, detailFragment);
+            ft.commit();
+            hideMenu = true;
+            invalidateOptionsMenu();
+        }
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
 }
