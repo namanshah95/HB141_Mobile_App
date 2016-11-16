@@ -105,6 +105,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
             @Override
             public void onMapReady(GoogleMap readyMap) {
                 googleMap = readyMap;
+                System.out.println("Map is ready");
                 googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 googleMap.setBuildingsEnabled(true);
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(33.762909, -84.422675), 6)); //defaults to atlanta
