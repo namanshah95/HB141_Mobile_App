@@ -1,12 +1,14 @@
 package com.binitshah.hb141;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -74,18 +76,19 @@ public class DetailFragment extends Fragment {
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         ViewGroup rootView = (ViewGroup)inflater.inflate(R.layout.fragment_detail, container, false);
-        final TextView address = (TextView)rootView.findViewById(R.id.detail_address_id);
-        final TextView phone = (TextView)rootView.findViewById(R.id.detail_phone_id);
-        final TextView url = (TextView)rootView.findViewById(R.id.detail_url_id);
-        final TextView status = (TextView)rootView.findViewById(R.id.detail_status_id);
+        final TextView mAddress = (TextView)rootView.findViewById(R.id.detail_address_id);
+        final TextView mPhone = (TextView)rootView.findViewById(R.id.detail_phone_id);
+        final TextView mUrl = (TextView)rootView.findViewById(R.id.detail_url_id);
+        final TextView mStatus = (TextView)rootView.findViewById(R.id.detail_status_id);
+        Button mReportButton = (Button)rootView.findViewById(R.id.detail_report_button_id);
 
         DatabaseReference ref = mDatabase.child("establishment").child(mParam1);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                address.setText(dataSnapshot.child("Address").getValue().toString());
-                phone.setText(dataSnapshot.child("Phone Number").getValue().toString());
-                url.setText(dataSnapshot.child("Website").getValue().toString());
+                mAddress.setText(dataSnapshot.child("Address").getValue().toString());
+                mPhone.setText(dataSnapshot.child("Phone Number").getValue().toString());
+                mUrl.setText(dataSnapshot.child("Website").getValue().toString());
             }
 
             @Override
@@ -106,7 +109,7 @@ public class DetailFragment extends Fragment {
                         s += node.getKey().toString() + node.getValue().toString();
                     }
                 }
-                status.setText(s);
+                mStatus.setText(s);
                 Calendar thirty_days_ago = Calendar.getInstance();
                 thirty_days_ago.add(Calendar.DAY_OF_MONTH, -30);
             }
@@ -118,15 +121,20 @@ public class DetailFragment extends Fragment {
         });
 */
 
+        mReportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initReportActivity();
+            }
+        });
 
         return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+    private void initReportActivity() {
+        Intent intent = new Intent(getActivity(), ReportActivity.class);
+        intent.putExtra("EID", mParam1);
+        startActivity(intent);
     }
 
     @Override
