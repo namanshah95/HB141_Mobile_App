@@ -10,15 +10,23 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -27,12 +35,18 @@ public class MainActivity extends AppCompatActivity
     boolean hideMenu = false;
     private int PLACE_AUTOCOMPLETE_REQUEST_CODE;
 
+    //Firebase Variables
+    private DatabaseReference mDatabase;
+    private String mUserId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_id);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -163,10 +177,20 @@ public class MainActivity extends AppCompatActivity
             if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
                 if (resultCode == RESULT_OK) {
                     Place place = PlaceAutocomplete.getPlace(this, data);
-                    MapFragment fragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
-                    fragment.updateMapViewPort(place.getViewport());
 
-    //                Log.i(TAG, "Place: " + place.getName());
+                    // Initialize Firebase Database Reference
+                    mDatabase = FirebaseDatabase.getInstance().getReference();
+
+                    mDatabase.child("establishment").child(place.getId()).child("Name").setValue(place.getName());
+                    mDatabase.child("establishment").child(place.getId()).child("Address").setValue(place.getAddress());
+                    mDatabase.child("establishment").child(place.getId()).child("Phone Number").setValue(place.getPhoneNumber());
+                    mDatabase.child("establishment").child(place.getId()).child("Website").setValue(place.getWebsiteUri());
+                    mDatabase.child("establishment").child(place.getId()).child("Place Type").setValue(place.getPlaceTypes());
+
+
+                    // /MapFragment fragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
+                    //fragment.updateMapViewPort(place.getViewport());
+
                 } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                     Status status = PlaceAutocomplete.getStatus(this, data);
                     // TODO: Handle the error.
