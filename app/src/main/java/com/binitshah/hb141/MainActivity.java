@@ -189,11 +189,11 @@ public class MainActivity extends AppCompatActivity
                     // Initialize Firebase Database Reference
                     mDatabase = FirebaseDatabase.getInstance().getReference();
 
-                    mDatabase.child("establishment").child(place.getId()).child("Name").setValue(place.getName());
-                    mDatabase.child("establishment").child(place.getId()).child("Address").setValue(place.getAddress());
-                    mDatabase.child("establishment").child(place.getId()).child("Phone Number").setValue(place.getPhoneNumber());
-                    mDatabase.child("establishment").child(place.getId()).child("Website").setValue(place.getWebsiteUri());
-                    mDatabase.child("establishment").child(place.getId()).child("Place Type").setValue(place.getPlaceTypes());
+                    mDatabase.child("establishment").child(place.getId()).child("Name").setValue(place.getName().toString());
+                    mDatabase.child("establishment").child(place.getId()).child("Address").setValue(place.getAddress().toString());
+                    mDatabase.child("establishment").child(place.getId()).child("Phone Number").setValue(place.getPhoneNumber().toString());
+                    mDatabase.child("establishment").child(place.getId()).child("Website").setValue(place.getWebsiteUri().toString());
+                    mDatabase.child("establishment").child(place.getId()).child("Place Type").setValue(place.getPlaceTypes().toString());
 
 
                     // /MapFragment fragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
