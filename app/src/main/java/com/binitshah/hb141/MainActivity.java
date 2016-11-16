@@ -16,12 +16,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity
     private DatabaseReference mDatabase;
     private String mUserId;
 
+    private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +50,7 @@ public class MainActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
+        mAuth = FirebaseAuth.getInstance();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_id);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -58,10 +62,11 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        boolean loggedIn = true; //todo modify by checking the SharedPreference for whether the user has been logged in or maybe Firebase will provide it.
+        //boolean loggedIn = true; //todo modify by checking the SharedPreference for whether the user has been logged in or maybe Firebase will provide it.
         String returningFrom = "nothing"; //todo modify by checking the Intent for an extraString value
-        if(!loggedIn){ //check if the person is logged in
+        if(mAuth.getCurrentUser() == null){ //check if the person is logged in
             //todo send the user through the onboarding/login process
+            startActivity(new Intent(this, OnboardingActivity.class));
         }
         else if(returningFrom.equals("prevreports")){
             //set the fragment to Previous Reports
@@ -93,7 +98,10 @@ public class MainActivity extends AppCompatActivity
             hideMenu = false;
             invalidateOptionsMenu();
         }
-        startActivity(new Intent(this, OnboardingActivity.class));
+        if (mAuth.getCurrentUser() != null) {
+            TextView subtitle = (TextView) navigationView.getHeaderView(0).findViewById((R.id.nav_header_subtitle_id));
+            subtitle.setText(mAuth.getCurrentUser().getEmail());
+        }
     }
 
     @Override
