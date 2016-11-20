@@ -2,43 +2,72 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.binitshah.hb141.DetailFragment">
+    tools:context="com.binitshah.hb141.DetailFragment"
+    android:background="@color/colorBackground">
 
     <!-- TODO: Update blank fragment layout -->
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="40dp"
+        android:weightSum="1">
+        <TextView
+            android:text="Location Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textAllCaps="true"
+            android:id="@+id/detail_location_name_id"
+            android:paddingBottom="20sp"
+            android:paddingTop="15sp"/>
 
         <TextView
             android:text="Sample Address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/detail_address_id" />
+            android:id="@+id/detail_address_id"
+            android:textSize="15sp"
+            android:paddingBottom="20sp"
+            android:paddingTop="15sp"/>
 
         <TextView
             android:text="###-###-####"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/detail_phone_id" />
+            android:id="@+id/detail_phone_id"
+            android:textSize="15sp"
+            android:paddingBottom="20sp"
+            android:paddingTop="15sp"/>
 
         <TextView
             android:text="Sample URL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/detail_url_id" />
+            android:id="@+id/detail_url_id"
+            android:textSize="15sp"
+            android:paddingBottom="20sp"
+            android:paddingTop="15sp"/>
 
         <TextView
             android:text="Status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/detail_status_id" />
+            android:id="@+id/detail_status_id"
+            android:textSize="15sp"
+            android:paddingBottom="20sp"
+            android:paddingTop="15sp"/>
 
         <Button
             android:text="Take Survey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/detail_report_button_id" />
+            android:id="@+id/detail_report_button_id"
+            android:paddingTop="20sp"
+            android:textAllCaps="true"
+            android:textSize="20sp"
+            android:paddingBottom="20sp" />
     </LinearLayout>
 </FrameLayout>
