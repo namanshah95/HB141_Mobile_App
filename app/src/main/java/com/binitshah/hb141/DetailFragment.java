@@ -82,7 +82,7 @@ public class DetailFragment extends Fragment {
         final TextView mPhone = (TextView)rootView.findViewById(R.id.detail_phone_id);
         final TextView mUrl = (TextView)rootView.findViewById(R.id.detail_url_id);
         final TextView mStatus = (TextView)rootView.findViewById(R.id.detail_status_id);
-        Button mReportButton = (Button)rootView.findViewById(R.id.detail_report_button_id);
+        final Button mReportButton = (Button)rootView.findViewById(R.id.detail_report_button_id);
 
         DatabaseReference ref = mDatabase.child("establishment").child(mParam1);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -105,13 +105,13 @@ public class DetailFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String s = status(dataSnapshot);
                 switch (s) {
-                    case "COMPLIES": mStatus.setTextColor(darker(Color.GREEN)); break;
-                    case "NEEDS VISIT": mStatus.setTextColor(darker(Color.YELLOW)); break;
+                    case "COMPLIES": mStatus.setTextColor(darker(Color.GREEN)); mReportButton.setEnabled(false); break;
+                    case "NEEDS VISIT": mStatus.setTextColor(darker(Color.YELLOW)); mReportButton.setEnabled(true); break;
                     case "1ST NEGATIVE REPORT":
                     case "2ND NEGATIVE REPORT":
                     case "3RD NEGATIVE REPORT":
-                    case "4TH NEGATIVE REPORT": mStatus.setTextColor(darker(Color.RED)); break;
-                    default: mStatus.setTextColor(Color.BLACK); break;
+                    case "4TH NEGATIVE REPORT": mStatus.setTextColor(darker(Color.RED)); mReportButton.setEnabled(false); break;
+                    default: mStatus.setTextColor(Color.BLACK); mReportButton.setEnabled(false); break;
                 }
                 mStatus.setText(s);
 

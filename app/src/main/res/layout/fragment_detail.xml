@@ -67,6 +67,7 @@
             android:id="@+id/detail_report_button_id"
             android:paddingTop="20sp"
             android:textAllCaps="true"
+            android:enabled="false"
             android:textSize="20sp"
             android:paddingBottom="20sp" />
     </LinearLayout>
