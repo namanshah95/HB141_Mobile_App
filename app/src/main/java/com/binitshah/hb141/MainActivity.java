@@ -197,9 +197,7 @@ public class MainActivity extends AppCompatActivity
                     mDatabase.child("establishment").child(place.getId()).child("Website").setValue(place.getWebsiteUri().toString());
                     mDatabase.child("establishment").child(place.getId()).child("Place Type").setValue(place.getPlaceTypes());
 
-
-
-                    //MapFragment fragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
+                    // /MapFragment fragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
                     //fragment.updateMapViewPort(place.getViewport());
 
                 } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {

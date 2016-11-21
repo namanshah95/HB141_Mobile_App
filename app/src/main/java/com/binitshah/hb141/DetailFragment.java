@@ -78,6 +78,7 @@ public class DetailFragment extends Fragment {
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         ViewGroup rootView = (ViewGroup)inflater.inflate(R.layout.fragment_detail, container, false);
+        final TextView mName = (TextView) rootView.findViewById(R.id.detail_location_name_id);
         final TextView mAddress = (TextView)rootView.findViewById(R.id.detail_address_id);
         final TextView mPhone = (TextView)rootView.findViewById(R.id.detail_phone_id);
         final TextView mUrl = (TextView)rootView.findViewById(R.id.detail_url_id);
@@ -88,6 +89,7 @@ public class DetailFragment extends Fragment {
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                mName.setText(dataSnapshot.child("Name").getValue().toString());
                 mAddress.setText(dataSnapshot.child("Address").getValue().toString());
                 mPhone.setText(dataSnapshot.child("Phone Number").getValue().toString());
                 mUrl.setText(dataSnapshot.child("Website").getValue().toString());
