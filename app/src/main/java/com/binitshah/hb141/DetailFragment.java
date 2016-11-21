@@ -2,6 +2,7 @@ package com.binitshah.hb141;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,9 +20,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 
 /**
@@ -96,22 +98,23 @@ public class DetailFragment extends Fragment {
 
             }
         });
-/*
-        Query query = mDatabase.child("report").orderByChild("EID").equalTo("1", "EID");
+
+        Query query = mDatabase.child("report").orderByChild("EID").equalTo(mParam1);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                int neg_reports = 0;
-                Calendar latest_report;
-                String s = "";
-                for (DataSnapshot key : dataSnapshot.getChildren()) {
-                    for (DataSnapshot node : key.getChildren()) {
-                        s += node.getKey().toString() + node.getValue().toString();
-                    }
+                String s = status(dataSnapshot);
+                switch (s) {
+                    case "COMPLIES": mStatus.setTextColor(darker(Color.GREEN)); break;
+                    case "NEEDS VISIT": mStatus.setTextColor(darker(Color.YELLOW)); break;
+                    case "1ST NEGATIVE REPORT":
+                    case "2ND NEGATIVE REPORT":
+                    case "3RD NEGATIVE REPORT":
+                    case "4TH NEGATIVE REPORT": mStatus.setTextColor(darker(Color.RED)); break;
+                    default: mStatus.setTextColor(Color.BLACK); break;
                 }
                 mStatus.setText(s);
-                Calendar thirty_days_ago = Calendar.getInstance();
-                thirty_days_ago.add(Calendar.DAY_OF_MONTH, -30);
+
             }
 
             @Override
@@ -119,7 +122,7 @@ public class DetailFragment extends Fragment {
 
             }
         });
-*/
+
 
         mReportButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -167,5 +170,64 @@ public class DetailFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private String status(DataSnapshot dataSnapshot) {
+        int neg_reports = 0;
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd yyyy HH:mm", Locale.ENGLISH);
+        Calendar latest_report = null;
+        String s = "";
+        for (DataSnapshot snap : dataSnapshot.getChildren()) {
+            boolean public_view = Boolean.parseBoolean(snap.child("Public View").getValue().toString());
+            boolean restroom_view = Boolean.parseBoolean(snap.child("Restroom View").getValue().toString());
+            boolean no_view = Boolean.parseBoolean(snap.child("No View").getValue().toString());
+
+            if (public_view && restroom_view) {
+                return "COMPLIES";
+            }
+            if (no_view && neg_reports < 4) {
+                neg_reports++;
+            }
+
+            Long year = (Long) snap.child("Datetime").child("year").getValue();
+            Long month = (Long) snap.child("Datetime").child("month").getValue();
+            Long day = (Long) snap.child("Datetime").child("day").getValue();
+            Calendar datetime = Calendar.getInstance();
+            datetime.set(year.intValue(), month.intValue(), day.intValue());
+            if (latest_report == null || datetime.after(latest_report)) {
+                latest_report = datetime;
+            }
+        }
+
+        Calendar thirty_days_ago = Calendar.getInstance();
+        thirty_days_ago.add(Calendar.DAY_OF_MONTH, -30);
+        if (latest_report == null || thirty_days_ago.after(latest_report)) {
+            return "NEEDS VISIT";
+        }
+
+        String ordinal = "";
+        switch (neg_reports) {
+            case 1:
+                ordinal = "1st";
+                break;
+            case 2:
+                ordinal = "2nd";
+                break;
+            case 3:
+                ordinal = "3rd";
+                break;
+            case 4:
+                ordinal = "4th";
+                break;
+        }
+        return ordinal + " NEGATIVE REPORT";
+    }
+
+    private int darker(int c) {
+        int a = Color.alpha(c);
+        int r = Color.red(c);
+        int g = Color.green(c);
+        int b = Color.blue(c);
+        return Color.argb(a, (int) (r*0.5), (int) (g*0.5), (int) (b*0.5));
     }
 }

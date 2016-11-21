@@ -79,7 +79,7 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private void sendReport() {
-        //String VID = mAuth.getCurrentUser().getUid(); GIVES Null pointer exception right now because user does not sign in yet
+        String VID = mAuth.getCurrentUser().getUid();
         boolean publicView = ((CheckBox)findViewById(R.id.publicview)).isChecked();
         boolean restroomView = ((CheckBox)findViewById(R.id.restroomview)).isChecked();
         boolean noView = ((CheckBox)findViewById(R.id.noview)).isChecked();
@@ -89,7 +89,7 @@ public class ReportActivity extends AppCompatActivity {
 
         String key = mDatabase.child("report").push().getKey();
         mDatabase.child("report").child(key).child("EID").setValue(EID);
-        mDatabase.child("report").child(key).child("VID").setValue("TODO"); //Replace with VID
+        mDatabase.child("report").child(key).child("VID").setValue(VID);
         mDatabase.child("report").child(key).child("Public View").setValue(publicView);
         mDatabase.child("report").child(key).child("Restroom View").setValue(restroomView);
         mDatabase.child("report").child(key).child("No View").setValue(noView);
