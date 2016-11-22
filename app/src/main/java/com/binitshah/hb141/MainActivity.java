@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        //boolean loggedIn = true; //todo modify by checking the SharedPreference for whether the user has been logged in or maybe Firebase will provide it.
         String returningFrom = "nothing"; //todo modify by checking the Intent for an extraString value
         if(mAuth.getCurrentUser() == null){ //check if the person is logged in
             //todo send the user through the onboarding/login process
@@ -138,6 +137,10 @@ public class MainActivity extends AppCompatActivity
             hideMenu = true;
             toolbar.setTitle(getResources().getString(R.string.nav_settings_string));
             fragment = new SettingsFragment();
+        } else if (id == R.id.nav_signout_id) {
+            hideMenu = true;
+            mAuth.signOut();
+            startActivity(new Intent(this, MainActivity.class));
         }
 
         if (fragment != null) {

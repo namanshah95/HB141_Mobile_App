@@ -1,6 +1,7 @@
 package com.binitshah.hb141;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -42,6 +43,7 @@ public class OnboardingFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private Context context;
 
     public static OnboardingFragment newInstance(int positionHolder) {
         OnboardingFragment fragment = new OnboardingFragment();
@@ -60,6 +62,7 @@ public class OnboardingFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = getActivity();
     }
 
     @Override
@@ -103,7 +106,7 @@ public class OnboardingFragment extends Fragment {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (firebaseAuth.getCurrentUser() != null) {
-                    startActivity(new Intent(getActivity(), MainActivity.class));
+                    startActivity(new Intent(context, MainActivity.class));
                 }
             }
         };
