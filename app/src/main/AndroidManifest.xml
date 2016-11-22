@@ -39,6 +39,7 @@
                 android:value="com.binitshah.hb141.MainActivity" />
         </activity>
         <activity android:name=".OnboardingActivity" />
+        <activity android:name=".LoginActivity"></activity>
     </application>
 
 </manifest>

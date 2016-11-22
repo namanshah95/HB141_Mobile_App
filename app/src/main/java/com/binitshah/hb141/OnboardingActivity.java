@@ -157,9 +157,8 @@ public class OnboardingActivity extends FragmentActivity {
         public Fragment getItem(int position) {
             if(position <= 6){
                 return OnboardingFragment.newInstance(position);
-            }
-            else{
-                return new LoginFragment();
+            } else {
+                return null;
             }
         }
     }

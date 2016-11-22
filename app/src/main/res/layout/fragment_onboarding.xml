@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/onboarding_fragment_id"
     tools:context="com.binitshah.hb141.OnboardingFragment"
     android:padding="16dp">
 
@@ -221,13 +222,36 @@
             android:layout_marginTop="24dp"
             android:hint="Password"
             android:id="@+id/password_field_id" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Already have an account? "
+            android:fontFamily="sans-serif"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:textColor="@color/colorText"
+            android:layout_below="@+id/password_field_id"
+            android:id="@+id/account_text" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Click Here"
+            android:fontFamily="sans-serif"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:clickable="true"
+            android:textColor="@color/colorText"
+            android:layout_toRightOf="@+id/account_text"
+            android:layout_below="@+id/password_field_id"
+            android:id="@+id/link_to_login_id" />
         <Button
-            android:text="Sign In"
+            android:text="Sign Up"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:id="@+id/sign_in_button_id" />
+            android:id="@+id/sign_up_button_id" />
+
 
     </RelativeLayout>
 

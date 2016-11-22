@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,11 +40,11 @@ public class OnboardingFragment extends Fragment {
 
     private EditText mEmailField;
     private EditText mPasswordField;
-    private Button mSignInButton;
+    private TextView mClickHere;
+    private Button mSignUpButton;
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private Context context;
 
     public static OnboardingFragment newInstance(int positionHolder) {
         OnboardingFragment fragment = new OnboardingFragment();
@@ -62,7 +63,7 @@ public class OnboardingFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getActivity();
+
     }
 
     @Override
@@ -99,22 +100,31 @@ public class OnboardingFragment extends Fragment {
 
         mEmailField = (EditText) rootView.findViewById(R.id.email_field_id);
         mPasswordField = (EditText) rootView.findViewById(R.id.password_field_id);
-        mSignInButton = (Button) rootView.findViewById(R.id.sign_in_button_id);
+        mClickHere = (TextView) rootView.findViewById(R.id.link_to_login_id);
+        mSignUpButton = (Button) rootView.findViewById(R.id.sign_up_button_id);
+
+        mClickHere.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println("TEST");
+                startActivity(new Intent(getActivity(), LoginActivity.class));
+            }
+        });
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (firebaseAuth.getCurrentUser() != null) {
-                    startActivity(new Intent(context, MainActivity.class));
+                    startActivity(new Intent(getActivity(), MainActivity.class));
                 }
             }
         };
 
-        mSignInButton.setOnClickListener(new View.OnClickListener() {
+        mSignUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startSignIn();
+                startSignUp();
             }
         });
 
@@ -127,17 +137,17 @@ public class OnboardingFragment extends Fragment {
         mAuth.addAuthStateListener(mAuthListener);
     }
 
-    private void startSignIn() {
+    private void startSignUp() {
         String email = mEmailField.getText().toString();
         String password = mPasswordField.getText().toString();
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
             Toast.makeText(getActivity(), "Fields are empty", Toast.LENGTH_LONG).show();
         } else {
-            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (!task.isSuccessful()) {
-                        Toast.makeText(getActivity(), "Sign In Problem", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Sign Up Problem", Toast.LENGTH_LONG).show();
                     }
                 }
             });

@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_signout_id) {
             hideMenu = true;
             mAuth.signOut();
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(MainActivity.this, MainActivity.class));
         }
 
         if (fragment != null) {

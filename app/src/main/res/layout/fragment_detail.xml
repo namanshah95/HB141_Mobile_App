@@ -5,7 +5,6 @@
     tools:context="com.binitshah.hb141.DetailFragment"
     android:background="@color/colorBackground">
 
-    <!-- TODO: Update blank fragment layout -->
 
     <LinearLayout
         android:orientation="vertical"
