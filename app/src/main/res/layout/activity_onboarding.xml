@@ -7,6 +7,13 @@
     android:layout_height="match_parent"
     tools:context="com.binitshah.hb141.OnboardingActivity">
 
+    <View
+        android:id="@+id/titleBackground"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_alignParentTop="true"
+        android:background="@android:color/white"/>
+
     <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/pager"
         android:layout_width="match_parent"
@@ -15,7 +22,7 @@
     <RelativeLayout
         android:id="@+id/onboarding_navigation"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:gravity="center_vertical">
 
@@ -24,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Back"
-            android:textSize="15sp"
+            android:textSize="17sp"
             android:textColor="@android:color/white"
             android:padding="10dp"
             style="@style/Widget.AppCompat.Button.Borderless"
@@ -42,7 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Next"
-            android:textSize="15sp"
+            android:textSize="17sp"
             android:textColor="@android:color/white"
             android:padding="10dp"
             style="@style/Widget.AppCompat.Button.Borderless"
@@ -50,7 +57,5 @@
             android:layout_marginEnd="28dp"/>
 
     </RelativeLayout>
-
-
 
 </RelativeLayout>

@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/onboarding_fragment_id"
     tools:context="com.binitshah.hb141.OnboardingFragment"
     android:padding="16dp">
 
@@ -12,23 +11,63 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/image_ihti"
-            android:layout_width="250dp"
+        <TextView
+            android:id="@+id/onboarding_page1Title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/logoihti"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="50dp"
-            android:contentDescription="@string/image_descrip_logo"/>
+            android:text="WELCOME TO HB141"
+            android:textSize="60sp"
+            android:lineSpacingExtra="-30dp"
+            android:textColor="@color/colorOnboarding1"
+            android:paddingBottom="16dp"
+            android:textAlignment="center"
+            android:layout_centerHorizontal="true" />
 
-        <ImageView
-            android:layout_width="250dp"
+        <TextView
+            android:id="@+id/partneredWithTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/logoncchr"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
-            android:layout_below="@+id/image_ihti"
-            android:contentDescription="@string/image_descrip_logo"/>
+            android:text="PARTNERED WITH"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="8dp"
+            android:layout_below="@+id/onboarding_page1Title"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/partneredWithTitle"
+            android:layout_above="@+id/navigation_placeHolder1">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/image_ihti"
+                    android:layout_width="300dp"
+                    android:layout_height="120dp"
+                    android:src="@drawable/logoihti"
+                    android:layout_centerHorizontal="true"
+                    android:contentDescription="@string/image_descrip_logo" />
+
+                <ImageView
+                    android:layout_width="300dp"
+                    android:layout_height="120dp"
+                    android:src="@drawable/logoncchr"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/image_ihti"
+                    android:contentDescription="@string/image_descrip_logo"/>
+
+            </RelativeLayout>
+
+        </ScrollView>
+
+        <View
+            android:id="@+id/navigation_placeHolder1"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
 
@@ -38,24 +77,41 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/image_smallihti"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:src="@drawable/logoihtismall"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
-            android:contentDescription="@string/image_descrip_logo"/>
-
         <TextView
+            android:id="@+id/onboarding_page2Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/image_smallihti"
-            android:text="@string/body_page2"
-            android:fontFamily="sans-serif-condensed"
-            android:textSize="20sp"
-            android:textColor="@android:color/white"/>
+            android:text="HUMAN TRAFFICKING"
+            android:textSize="40sp"
+            android:lineSpacingExtra="-20dp"
+            android:textColor="@color/colorOnboarding2"
+            android:paddingBottom="16dp"
+            android:layout_marginStart="16dp" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/onboarding_page2Title"
+            android:layout_above="@+id/navigation_placeHolder2">
+
+            <TextView
+                android:id="@+id/onboarding_page2Content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/body_page2"
+                android:fontFamily="sans-serif-condensed"
+                android:textSize="20sp"
+                android:lineSpacingExtra="-10dp"
+                android:textColor="@android:color/white"/>
+
+        </ScrollView>
+
+        <View
+            android:id="@+id/navigation_placeHolder2"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
 
@@ -65,72 +121,156 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@id/image_smallihti"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:src="@drawable/logoihtismall"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
-            android:contentDescription="@string/image_descrip_logo"/>
-
         <TextView
-            android:id="@+id/body_page3"
+            android:id="@+id/onboarding_page3Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/image_smallihti"
-            android:text="@string/body_page3"
-            android:fontFamily="sans-serif-condensed"
-            android:textSize="20sp"
-            android:textColor="@android:color/white"/>
+            android:text="ESTIMATES"
+            android:textSize="40sp"
+            android:lineSpacingExtra="-20dp"
+            android:textColor="@color/colorOnboarding3"
+            android:paddingBottom="16dp"
+            android:layout_marginStart="16dp"/>
 
-        <TextView
-            android:id="@+id/page3_fact1"
-            android:layout_width="wrap_content"
+        <ScrollView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/body_page3"
-            android:layout_marginStart="30dp"
-            android:layout_marginTop="10dp"
-            android:text="@string/page3_fact1"
-            android:fontFamily="sans-serif-condensed"
-            android:textSize="20sp"
-            android:textColor="@android:color/white"/>
+            android:layout_below="@+id/onboarding_page3Title"
+            android:layout_above="@+id/navigation_placeHolder3">
 
-        <TextView
-            android:id="@+id/page3_fact2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/page3_fact1"
-            android:layout_marginStart="30dp"
-            android:layout_marginTop="10dp"
-            android:text="@string/page3_fact2"
-            android:fontFamily="sans-serif-condensed"
-            android:textSize="20sp"
-            android:textColor="@android:color/white"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal">
 
-        <TextView
-            android:id="@+id/page3_fact3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/page3_fact2"
-            android:layout_marginStart="30dp"
-            android:layout_marginTop="10dp"
-            android:text="@string/page3_fact3"
-            android:fontFamily="sans-serif-condensed"
-            android:textSize="20sp"
-            android:textColor="@android:color/white"/>
+                <TextView
+                    android:id="@+id/onboarding_page3Subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="THE INTERNATIONAL LABOUR ORGANIZATION ESTIMATES:"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="20sp"
+                    android:lineSpacingExtra="-10dp"
+                    android:textColor="@android:color/white"/>
 
-        <TextView
-            android:id="@+id/source"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/page3_fact3"
-            android:layout_marginTop="30dp"
-            android:text="@string/source"
-            android:fontFamily="sans-serif-condensed"
-            android:textSize="15sp"
-            android:textColor="@android:color/white"/>
+                <TextView
+                    android:id="@+id/onboarding_page3StatNum1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-25dp"
+                    android:text="20.9"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="50sp"
+                    android:lineSpacingExtra="-25dp"
+                    android:textColor="@android:color/white"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/onboarding_page3Subtitle"/>
+
+                <TextView
+                    android:id="@+id/onboarding_page3Stat1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="million victims of human trafficking globally."
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="20sp"
+                    android:lineSpacingExtra="-10dp"
+                    android:textColor="@android:color/white"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center_horizontal"
+                    android:layout_below="@+id/onboarding_page3StatNum1"
+                    android:layout_marginTop="-30dp"/>
+
+                <TextView
+                    android:id="@+id/onboarding_page3StatNum2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-20dp"
+                    android:text="68%"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="50sp"
+                    android:lineSpacingExtra="-25dp"
+                    android:textColor="@android:color/white"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/onboarding_page3Stat1"/>
+
+                <TextView
+                    android:id="@+id/onboarding_page3Stat2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="of them are trapped in forced labour."
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="20sp"
+                    android:lineSpacingExtra="-10dp"
+                    android:textColor="@android:color/white"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center_horizontal"
+                    android:layout_below="@+id/onboarding_page3StatNum2"
+                    android:layout_marginTop="-30dp"/>
+
+                <TextView
+                    android:id="@+id/onboarding_page3StatNum3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-20dp"
+                    android:text="26%"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="50sp"
+                    android:lineSpacingExtra="-25dp"
+                    android:textColor="@android:color/white"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/onboarding_page3Stat2"/>
+
+                <TextView
+                    android:id="@+id/onboarding_page3Stat3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="of them are children."
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="20sp"
+                    android:lineSpacingExtra="-10dp"
+                    android:textColor="@android:color/white"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center_horizontal"
+                    android:layout_below="@+id/onboarding_page3StatNum3"
+                    android:layout_marginTop="-30dp" />
+
+                <TextView
+                    android:id="@+id/onboarding_page3StatNum4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-20dp"
+                    android:text="55%"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="50sp"
+                    android:lineSpacingExtra="-25dp"
+                    android:textColor="@android:color/white"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/onboarding_page3Stat3"/>
+
+                <TextView
+                    android:id="@+id/onboarding_page3Stat4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="are women and girls."
+                    android:fontFamily="sans-serif-condensed"
+                    android:textSize="20sp"
+                    android:lineSpacingExtra="-10dp"
+                    android:textColor="@android:color/white"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center_horizontal"
+                    android:layout_below="@+id/onboarding_page3StatNum4"
+                    android:layout_marginTop="-30dp" />
+
+            </RelativeLayout>
+
+        </ScrollView>
+
+        <View
+            android:id="@+id/navigation_placeHolder3"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
 
@@ -140,58 +280,42 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@id/image_smallihti"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:src="@drawable/logoihtismall"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
-            android:contentDescription="@string/image_descrip_logo"/>
-
         <TextView
-            android:id="@+id/body_page4"
+            android:id="@+id/onboarding_page4Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/image_smallihti"
-            android:text="@string/body_page4"
-            android:fontFamily="sans-serif-condensed"
-            android:textSize="20sp"
-            android:textColor="@android:color/white"/>
-
-        <TextView
-            android:id="@+id/body_page4_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/body_page4"
-            android:text="@string/body_page4_title"
-            android:fontFamily="sans-serif"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:textColor="@android:color/white"/>
+            android:text="HOW WE CAN HELP"
+            android:textSize="40sp"
+            android:lineSpacingExtra="-20dp"
+            android:textColor="@color/colorOnboarding4"
+            android:paddingBottom="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="60dp"/>
 
         <ScrollView
-            android:layout_below="@+id/body_page4_title"
-            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:padding="16dp"
-            android:layout_marginBottom="80dp"
-            android:background="@color/colorBackground">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/onboarding_page4Title"
+            android:layout_above="@+id/navigation_placeHolder4">
 
             <TextView
-                android:id="@+id/body_page4_bill"
+                android:id="@+id/onboarding_page4Content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/body_page4_bill"
-                android:fontFamily="sans-serif"
-                android:textStyle="bold"
-                android:textSize="15sp"
-                android:textColor="@color/colorText"/>
+                android:layout_marginTop="8dp"
+                android:text="@string/body_page4"
+                android:fontFamily="sans-serif-condensed"
+                android:textSize="20sp"
+                android:lineSpacingExtra="-10dp"
+                android:textColor="@android:color/white"/>
 
         </ScrollView>
+
+        <View
+            android:id="@+id/navigation_placeHolder4"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
 
@@ -201,57 +325,30 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
-            android:ems="10"
-            android:layout_alignParentTop="true"
-            android:layout_alignEnd="@+id/sign_in_button_id"
-            android:layout_marginTop="36dp"
-            android:hint="Email"
-            android:id="@+id/email_field_id" />
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:ems="10"
-            android:layout_below="@+id/email_field_id"
-            android:layout_alignStart="@+id/email_field_id"
-            android:layout_marginTop="24dp"
-            android:hint="Password"
-            android:id="@+id/password_field_id" />
         <TextView
+            android:id="@+id/onboarding_page5Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Already have an account? "
-            android:fontFamily="sans-serif"
-            android:textStyle="bold"
-            android:textSize="15sp"
-            android:textColor="@color/colorText"
-            android:layout_below="@+id/password_field_id"
-            android:id="@+id/account_text" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Click Here"
-            android:fontFamily="sans-serif"
-            android:textStyle="bold"
-            android:textSize="15sp"
-            android:clickable="true"
-            android:textColor="@color/colorText"
-            android:layout_toRightOf="@+id/account_text"
-            android:layout_below="@+id/password_field_id"
-            android:id="@+id/link_to_login_id" />
-        <Button
-            android:text="Sign Up"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:id="@+id/sign_up_button_id" />
+            android:text="HOW IT WORKS"
+            android:textSize="30sp"
+            android:lineSpacingExtra="-15dp"
+            android:textColor="@color/colorOnboarding5"
+            android:paddingBottom="16dp"
+            android:layout_marginStart="16dp" />
 
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/onboarding_page5Title"
+            android:layout_above="@+id/navigation_placeHolder5">
+
+        </ScrollView>
+
+        <View
+            android:id="@+id/navigation_placeHolder5"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
 
@@ -260,24 +357,6 @@
         android:id="@+id/onboarding_page6"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <ImageView
-            android:id="@id/image_ihti"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:src="@drawable/logoihti"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="50dp"
-            android:contentDescription="@string/image_descrip_logo"/>
-
-        <ImageView
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:src="@drawable/logoncchr"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
-            android:layout_below="@+id/image_ihti"
-            android:contentDescription="@string/image_descrip_logo"/>
 
     </RelativeLayout>
 

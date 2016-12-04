@@ -9,10 +9,10 @@
     <color name="colorTransparent">@android:color/transparent</color>
     <color name="colorDarkenTint">#66000000</color>
 
-    <color name="colorOnboarding1">#4d8c46</color>
-    <color name="colorOnboarding2">#588c7e</color>
-    <color name="colorOnboarding3">#58708c</color>
-    <color name="colorOnboarding4">#f2e394</color>
+    <color name="colorOnboarding1">#743C9C</color>
+    <color name="colorOnboarding2">#4D8C46</color>
+    <color name="colorOnboarding3">#588C7E</color>
+    <color name="colorOnboarding4">#58708C</color>
     <color name="colorOnboarding5">#f2ae72</color>
     <color name="colorOnboarding6">#d96459</color>
     <color name="colorOnboarding7">#8c4646</color>

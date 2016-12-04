@@ -40,9 +40,7 @@ public class MainActivity extends AppCompatActivity
 
     //Firebase Variables
     private DatabaseReference mDatabase;
-
     private FirebaseAuth mAuth;
-
     private Place place;
 
     @Override

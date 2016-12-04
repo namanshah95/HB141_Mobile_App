@@ -3,12 +3,14 @@ package com.binitshah.hb141;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,22 +31,11 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class OnboardingFragment extends Fragment {
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment OnboardingFragment.
-     */
+    public TextView onboardingPageTitle;
+    public TextView onboardingPageSubTitle;
+    public TextView onboardingPageMainContent;
 
     private int position;
-
-    private EditText mEmailField;
-    private EditText mPasswordField;
-    private TextView mClickHere;
-    private Button mSignUpButton;
-
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
 
     public static OnboardingFragment newInstance(int positionHolder) {
         OnboardingFragment fragment = new OnboardingFragment();
@@ -63,7 +54,6 @@ public class OnboardingFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -71,22 +61,58 @@ public class OnboardingFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_onboarding, container, false);
+
+        Typeface font = Typeface.createFromAsset(getActivity().getAssets(), "Changa 800.ttf");
+        Typeface fontThin = Typeface.createFromAsset(getActivity().getAssets(), "Changa 200.ttf");
+
         switch (position) {
             case 0:
                 RelativeLayout relativeLayout1 = (RelativeLayout) rootView.findViewById(R.id.onboarding_page1);
                 relativeLayout1.setVisibility(View.VISIBLE);
+                onboardingPageTitle = (TextView) rootView.findViewById(R.id.onboarding_page1Title);
+                onboardingPageSubTitle = (TextView) rootView.findViewById(R.id.partneredWithTitle);
+                onboardingPageTitle.setTypeface(font);
+                onboardingPageSubTitle.setTypeface(font);
                 break;
             case 1:
                 RelativeLayout relativeLayout2 = (RelativeLayout) rootView.findViewById(R.id.onboarding_page2);
                 relativeLayout2.setVisibility(View.VISIBLE);
+                onboardingPageTitle = (TextView) rootView.findViewById(R.id.onboarding_page2Title);
+                onboardingPageMainContent = (TextView) rootView.findViewById(R.id.onboarding_page2Content);
+                onboardingPageTitle.setTypeface(font);
+                onboardingPageMainContent.setTypeface(font);
                 break;
             case 2:
                 RelativeLayout relativeLayout3 = (RelativeLayout) rootView.findViewById(R.id.onboarding_page3);
                 relativeLayout3.setVisibility(View.VISIBLE);
+                onboardingPageSubTitle = (TextView) rootView.findViewById(R.id.onboarding_page3Subtitle);
+                onboardingPageTitle = (TextView) rootView.findViewById(R.id.onboarding_page3Title);
+                TextView statnum1 = (TextView) rootView.findViewById(R.id.onboarding_page3StatNum1);
+                TextView statnum2 = (TextView) rootView.findViewById(R.id.onboarding_page3StatNum2);
+                TextView statnum3 = (TextView) rootView.findViewById(R.id.onboarding_page3StatNum3);
+                TextView statnum4 = (TextView) rootView.findViewById(R.id.onboarding_page3StatNum4);
+                TextView stat1 = (TextView) rootView.findViewById(R.id.onboarding_page3Stat1);
+                TextView stat2 = (TextView) rootView.findViewById(R.id.onboarding_page3Stat2);
+                TextView stat3 = (TextView) rootView.findViewById(R.id.onboarding_page3Stat3);
+                TextView stat4 = (TextView) rootView.findViewById(R.id.onboarding_page3Stat4);
+                onboardingPageSubTitle.setTypeface(font);
+                onboardingPageTitle.setTypeface(font);
+                statnum1.setTypeface(fontThin);
+                statnum2.setTypeface(fontThin);
+                statnum3.setTypeface(fontThin);
+                statnum4.setTypeface(fontThin);
+                stat1.setTypeface(font);
+                stat2.setTypeface(font);
+                stat3.setTypeface(font);
+                stat4.setTypeface(font);
                 break;
             case 3:
                 RelativeLayout relativeLayout4 = (RelativeLayout) rootView.findViewById(R.id.onboarding_page4);
                 relativeLayout4.setVisibility(View.VISIBLE);
+                onboardingPageTitle = (TextView) rootView.findViewById(R.id.onboarding_page4Title);
+                onboardingPageMainContent = (TextView) rootView.findViewById(R.id.onboarding_page4Content);
+                onboardingPageMainContent.setTypeface(font);
+                onboardingPageTitle.setTypeface(font);
                 break;
             case 4:
                 RelativeLayout relativeLayout5 = (RelativeLayout) rootView.findViewById(R.id.onboarding_page5);
@@ -98,60 +124,20 @@ public class OnboardingFragment extends Fragment {
                 break;
         }
 
-        mEmailField = (EditText) rootView.findViewById(R.id.email_field_id);
-        mPasswordField = (EditText) rootView.findViewById(R.id.password_field_id);
-        mClickHere = (TextView) rootView.findViewById(R.id.link_to_login_id);
-        mSignUpButton = (Button) rootView.findViewById(R.id.sign_up_button_id);
-
-        mClickHere.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println("TEST");
-                startActivity(new Intent(getActivity(), LoginActivity.class));
-            }
-        });
-
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() != null) {
-                    startActivity(new Intent(getActivity(), MainActivity.class));
-                }
-            }
-        };
-
-        mSignUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startSignUp();
-            }
-        });
-
         return rootView;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    private void startSignUp() {
-        String email = mEmailField.getText().toString();
-        String password = mPasswordField.getText().toString();
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(getActivity(), "Fields are empty", Toast.LENGTH_LONG).show();
+    public int getTitleHeight() {
+        if (position == 0 || position == 1 || position == 2 || position == 3) {
+            return onboardingPageTitle.getHeight() + dpToPx(16);
         } else {
-            mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (!task.isSuccessful()) {
-                        Toast.makeText(getActivity(), "Sign Up Problem", Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
+            return position*100  + dpToPx(16);
         }
     }
 
+    public int dpToPx(int dp) {
+        DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
+        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return px;
+    }
 }
