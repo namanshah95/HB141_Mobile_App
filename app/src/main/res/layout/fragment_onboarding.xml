@@ -23,20 +23,11 @@
             android:textAlignment="center"
             android:layout_centerHorizontal="true" />
 
-        <TextView
-            android:id="@+id/partneredWithTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="PARTNERED WITH"
-            android:textSize="20sp"
-            android:textColor="@android:color/white"
-            android:layout_marginTop="8dp"
-            android:layout_below="@+id/onboarding_page1Title"/>
-
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/partneredWithTitle"
+            android:layout_marginTop="8dp"
+            android:layout_below="@+id/onboarding_page1Title"
             android:layout_above="@+id/navigation_placeHolder1">
 
             <RelativeLayout
@@ -44,20 +35,22 @@
                 android:layout_height="wrap_content">
 
                 <ImageView
-                    android:id="@+id/image_ihti"
-                    android:layout_width="300dp"
-                    android:layout_height="120dp"
-                    android:src="@drawable/logoihti"
+                    android:id="@+id/logos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="100dp"
+                    android:src="@drawable/twologos"
                     android:layout_centerHorizontal="true"
                     android:contentDescription="@string/image_descrip_logo" />
 
-                <ImageView
-                    android:layout_width="300dp"
-                    android:layout_height="120dp"
-                    android:src="@drawable/logoncchr"
-                    android:layout_centerHorizontal="true"
-                    android:layout_below="@+id/image_ihti"
-                    android:contentDescription="@string/image_descrip_logo"/>
+                <TextView
+                    android:id="@+id/thankyoumessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thank you for your help in preventing human trafficking."
+                    android:textSize="20sp"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:layout_below="@+id/logos"/>
 
             </RelativeLayout>
 
@@ -342,6 +335,17 @@
             android:layout_below="@+id/onboarding_page5Title"
             android:layout_above="@+id/navigation_placeHolder5">
 
+            <TextView
+                android:id="@+id/onboarding_page5Content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/body_page5"
+                android:fontFamily="sans-serif-condensed"
+                android:textSize="20sp"
+                android:lineSpacingExtra="-10dp"
+                android:textColor="@android:color/white"/>
+
         </ScrollView>
 
         <View
@@ -351,14 +355,5 @@
             android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
-
-    <RelativeLayout
-        android:visibility="gone"
-        android:id="@+id/onboarding_page6"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </RelativeLayout>
-
 
 </RelativeLayout>

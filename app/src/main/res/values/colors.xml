@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#49176d</color>
+    <color name="colorPrimary">#74269e</color>
     <color name="colorPrimaryDark">#3d165a</color>
-    <color name="colorAccent">#fe7200</color>
-    <color name="colorText">#000000</color>
-    <color name="colorBackground">#e9e9e9</color>
+    <color name="colorAccent">#ff8a65</color>
+    <color name="colorText">#232323</color>
 
     <color name="colorTransparent">@android:color/transparent</color>
     <color name="colorDarkenTint">#66000000</color>
 
-    <color name="colorOnboarding1">#743C9C</color>
-    <color name="colorOnboarding2">#4D8C46</color>
-    <color name="colorOnboarding3">#588C7E</color>
-    <color name="colorOnboarding4">#58708C</color>
-    <color name="colorOnboarding5">#f2ae72</color>
-    <color name="colorOnboarding6">#d96459</color>
-    <color name="colorOnboarding7">#8c4646</color>
-    <color name="colorOnboarding8">@color/colorPrimary</color>
+    <color name="colorOnboarding1">#606078</color>
+    <color name="colorOnboarding2">#786078</color>
+    <color name="colorOnboarding3">#A89090</color>
+    <color name="colorOnboarding4">#90A8A8</color>
+    <color name="colorOnboarding5">#90a898</color>
 </resources>

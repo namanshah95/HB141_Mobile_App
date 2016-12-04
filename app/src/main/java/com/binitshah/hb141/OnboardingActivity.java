@@ -109,16 +109,21 @@ public class OnboardingActivity extends FragmentActivity {
                 if(mPager.getCurrentItem() != 0) {
                     mPager.setCurrentItem(mPager.getCurrentItem() - 1, true);
                 }
+                else {
+                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                }
             }
         });
-        prevButton.setVisibility(View.GONE);
 
         nextButton = (Button) findViewById(R.id.forward_button);
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mPager.getCurrentItem() != 6){
+                if(mPager.getCurrentItem() != 4){
                     mPager.setCurrentItem(mPager.getCurrentItem() + 1, true);
+                }
+                else {
+                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                 }
             }
         });
@@ -156,11 +161,18 @@ public class OnboardingActivity extends FragmentActivity {
 
             @Override
             public void onPageSelected(int position) {
-                if(position != 0){
-                    prevButton.setVisibility(View.VISIBLE);
+                if(position == 0){
+                    prevButton.setText("SKIP");
                 }
                 else {
-                    prevButton.setVisibility(View.GONE);
+                    prevButton.setText("BACK");
+                }
+
+                if(position == 4) {
+                    nextButton.setText("JOIN");
+                }
+                else {
+                    nextButton.setText("NEXT");
                 }
             }
 
@@ -174,7 +186,7 @@ public class OnboardingActivity extends FragmentActivity {
      * sequence.
      */
     public class OnboardingPagerAdapter extends FragmentStatePagerAdapter {
-        private final int NUM_PAGES = 7;
+        private final int NUM_PAGES = 5;
         SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 
         OnboardingPagerAdapter(FragmentManager fm) {
@@ -186,12 +198,7 @@ public class OnboardingActivity extends FragmentActivity {
 
         @Override
         public Fragment getItem(int position) {
-            if(position <= 6){
-                return OnboardingFragment.newInstance(position);
-            }
-            else{
-                return null;
-            }
+            return OnboardingFragment.newInstance(position);
         }
 
         @Override
@@ -243,18 +250,6 @@ public class OnboardingActivity extends FragmentActivity {
                 prevColor = ContextCompat.getColor(getApplicationContext(), R.color.colorOnboarding4);
                 thisColor = ContextCompat.getColor(getApplicationContext(), R.color.colorOnboarding5);
                 relativeLayout.setBackgroundColor(thisColor);
-                nextColor = ContextCompat.getColor(getApplicationContext(), R.color.colorOnboarding6);
-                break;
-            case 5:
-                prevColor = ContextCompat.getColor(getApplicationContext(), R.color.colorOnboarding5);
-                thisColor = ContextCompat.getColor(getApplicationContext(), R.color.colorOnboarding6);
-                relativeLayout.setBackgroundColor(thisColor);
-                nextColor = ContextCompat.getColor(getApplicationContext(), R.color.colorOnboarding7);
-                break;
-            case 6:
-                prevColor = ContextCompat.getColor(getApplicationContext(), R.color.colorOnboarding6);
-                thisColor = ContextCompat.getColor(getApplicationContext(), R.color.colorOnboarding7);
-                relativeLayout.setBackgroundColor(thisColor);
                 nextColor = ContextCompat.getColor(getApplicationContext(), R.color.colorTransparent);
                 break;
             default:
@@ -292,7 +287,7 @@ public class OnboardingActivity extends FragmentActivity {
                     }
                 });
                 break;
-            case 6:
+            case 4:
                 mPager.post(new Runnable() {
                     @Override
                     public void run() {

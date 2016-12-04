@@ -70,7 +70,7 @@ public class OnboardingFragment extends Fragment {
                 RelativeLayout relativeLayout1 = (RelativeLayout) rootView.findViewById(R.id.onboarding_page1);
                 relativeLayout1.setVisibility(View.VISIBLE);
                 onboardingPageTitle = (TextView) rootView.findViewById(R.id.onboarding_page1Title);
-                onboardingPageSubTitle = (TextView) rootView.findViewById(R.id.partneredWithTitle);
+                onboardingPageSubTitle = (TextView) rootView.findViewById(R.id.thankyoumessage);
                 onboardingPageTitle.setTypeface(font);
                 onboardingPageSubTitle.setTypeface(font);
                 break;
@@ -117,10 +117,10 @@ public class OnboardingFragment extends Fragment {
             case 4:
                 RelativeLayout relativeLayout5 = (RelativeLayout) rootView.findViewById(R.id.onboarding_page5);
                 relativeLayout5.setVisibility(View.VISIBLE);
-                break;
-            case 5:
-                RelativeLayout relativeLayout6 = (RelativeLayout) rootView.findViewById(R.id.onboarding_page6);
-                relativeLayout6.setVisibility(View.VISIBLE);
+                onboardingPageTitle = (TextView) rootView.findViewById(R.id.onboarding_page5Title);
+                onboardingPageTitle.setTypeface(font);
+                onboardingPageMainContent = (TextView) rootView.findViewById(R.id.onboarding_page5Content);
+                onboardingPageMainContent.setTypeface(font);
                 break;
         }
 
@@ -128,11 +128,7 @@ public class OnboardingFragment extends Fragment {
     }
 
     public int getTitleHeight() {
-        if (position == 0 || position == 1 || position == 2 || position == 3) {
-            return onboardingPageTitle.getHeight() + dpToPx(16);
-        } else {
-            return position*100  + dpToPx(16);
-        }
+        return onboardingPageTitle.getHeight() + dpToPx(16);
     }
 
     public int dpToPx(int dp) {
