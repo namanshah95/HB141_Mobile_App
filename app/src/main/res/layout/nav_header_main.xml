@@ -12,12 +12,14 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:id="@+id/nav_header_main_id">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/nav_header_propic_id"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:src="@drawable/ic_header_propic" />
+        android:src="@drawable/ic_header_propic"
+        app:civ_border_width="0dp"
+        app:civ_border_color="#ffffff"/>
 
     <TextView
         android:id="@+id/nav_header_maintitle_id"

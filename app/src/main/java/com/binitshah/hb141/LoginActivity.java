@@ -7,8 +7,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,63 +18,91 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends Activity {
 
-    private EditText mEmailField;
-    private EditText mPasswordField;
-    private Button mSignInButton;
+    //switchers
+    private RelativeLayout signInView;
+    private RelativeLayout signUpView;
+    private RelativeLayout socialsView;
+    private Button signUpButton;
 
+    //Sign up: email/pass
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private EditText nameSignUpField;
+    private EditText emailSignUpField;
+    private EditText passwordSignUpField;
+    private EditText confirmPassSignUpField;
+    private Button signInButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        mEmailField = (EditText) findViewById(R.id.email_field_id);
-        mPasswordField = (EditText) findViewById(R.id.password_field_id);
-        mSignInButton = (Button) findViewById(R.id.sign_in_button_id);
+        //handles switching to sign up view
+        signInView = (RelativeLayout) findViewById(R.id.sign_in_view);
+        signUpView = (RelativeLayout) findViewById(R.id.sign_up_view);
+        socialsView = (RelativeLayout) findViewById(R.id.social_media_view);
+        signUpButton = (Button) findViewById(R.id.sign_up_button);
+        signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                p.addRule(RelativeLayout.BELOW, R.id.sign_up_view);
+                p.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                p.setMargins(0, 10, 0, 0);
 
+                socialsView.setLayoutParams(p);
+                signInView.setVisibility(View.GONE);
+                signUpView.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //mAuth listener
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() != null) {
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            public void onAuthStateChanged(@NonNull FirebaseAuth mFirebaseAuth) {
+                FirebaseUser user = mFirebaseAuth.getCurrentUser();
+                if(user != null) {
+                    //user has signed in
+                }
+                else {
+                    //user has signed out
                 }
             }
         };
 
-        mSignInButton.setOnClickListener(new View.OnClickListener() {
+        nameSignUpField = (EditText) findViewById(R.id.name_signup_field_id);
+        emailSignUpField = (EditText) findViewById(R.id.email_signup_field_id);
+        passwordSignUpField = (EditText) findViewById(R.id.password_signup_field_id);
+        confirmPassSignUpField = (EditText) findViewById(R.id.password_confirm_signup_field_id);
+        signUpButton = (Button) findViewById(R.id.signup_button);
+        signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startSignIn();
+
             }
         });
+
+
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
     }
 
-    private void startSignIn() {
-        String email = mEmailField.getText().toString();
-        String password = mPasswordField.getText().toString();
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(LoginActivity.this, "Fields are empty", Toast.LENGTH_LONG).show();
-        } else {
-            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (!task.isSuccessful()) {
-                        Toast.makeText(LoginActivity.this, "Sign In Problem", Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
         }
     }
 }

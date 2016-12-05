@@ -38,8 +38,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.binitshah.hb141.MainActivity" />
         </activity>
-        <activity android:name=".OnboardingActivity" />
-        <activity android:name=".LoginActivity"></activity>
+        <activity android:name=".OnboardingActivity"
+            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" />
+        <activity android:name=".LoginActivity" />
     </application>
 
 </manifest>
