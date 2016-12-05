@@ -1,11 +1,23 @@
 package com.binitshah.hb141;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Environment;
+import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -14,40 +26,84 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class LoginActivity extends Activity {
+
+    private Context context;
+    private SharedPreferences sharedPref;
+    private FirebaseStorage storage;
+    private ProgressDialog pDialog;
 
     //switchers
     private RelativeLayout signInView;
     private RelativeLayout signUpView;
     private RelativeLayout socialsView;
-    private Button signUpButton;
+    private RelativeLayout resetView;
+    private Button signUpSwitcherButton;
+    private Button forgotPassSwitcherButton;
 
     //Sign up: email/pass
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private DatabaseReference mDatabase;
     private EditText nameSignUpField;
     private EditText emailSignUpField;
     private EditText passwordSignUpField;
     private EditText confirmPassSignUpField;
+    private Button signUpButton;
+    private CircleImageView mSignUpPropic;
+    private Bitmap photo;
+    private boolean photoTaken = false;
+
+    //sign in: email/pass
+    private EditText emailField;
+    private EditText passwordField;
     private Button signInButton;
+
+    //password reset
+    private EditText emailResetField;
+    private Button passResetButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        context = getApplication();
+        sharedPref = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        storage = FirebaseStorage.getInstance();
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Loading...");
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
         //handles switching to sign up view
         signInView = (RelativeLayout) findViewById(R.id.sign_in_view);
         signUpView = (RelativeLayout) findViewById(R.id.sign_up_view);
         socialsView = (RelativeLayout) findViewById(R.id.social_media_view);
-        signUpButton = (Button) findViewById(R.id.sign_up_button);
-        signUpButton.setOnClickListener(new View.OnClickListener() {
+        signUpSwitcherButton = (Button) findViewById(R.id.sign_up_switcher_button);
+        signUpSwitcherButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -70,26 +126,374 @@ public class LoginActivity extends Activity {
                 FirebaseUser user = mFirebaseAuth.getCurrentUser();
                 if(user != null) {
                     //user has signed in
-                }
-                else {
-                    //user has signed out
+                    Log.d("HB141Log", "User has signed in");
+                    if(photoTaken) {//we know that if photo was set, that the user when through the flow of signing up
+                        StorageReference storageRef = storage.getReferenceFromUrl("gs://hb141-2fc0d.appspot.com");
+                        StorageReference userpropic = storageRef.child("propics/" + user.getUid() + "-propic.jpg");
+
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        photo.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                        byte[] data = baos.toByteArray();
+
+                        UploadTask mUploadTask = userpropic.putBytes(data);
+                        mUploadTask.addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                try {
+                                    File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "hb141");
+                                    file.mkdir();
+                                    File image = new File(file.getAbsoluteFile(), "propic.jpg");
+                                    FileOutputStream out = new FileOutputStream(image);
+                                    photo.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                                    out.flush();
+                                    out.close();
+                                    Log.d("HB141Log", "Bitmap was saved locally.");
+                                    finishCreateUser();
+                                }
+                                catch (Exception ex) {
+                                    Toast.makeText(LoginActivity.this, "Listen brother, it's really not your day. I've tried everything and something keeps breaking. You're not even supposed to see this message. If you do, just do us both a solid and try again with a different email address.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                Uri propicUri = taskSnapshot.getDownloadUrl();
+                                Log.d("HB141Log", "Bitmap was saved online at" + propicUri.toString());
+                                finishCreateUser(propicUri);
+                            }
+                        });
+                    }
+                    else { //the user did not just register.
+                        pDialog.dismiss();
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
+                    }
                 }
             }
         };
 
+        //handles sign up
+        mSignUpPropic = (CircleImageView) findViewById(R.id.propic_signup_field_id);
+        mSignUpPropic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CharSequence options[] = new CharSequence[] {"File System", "Camera"};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                builder.setTitle("Get Image From");
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // the user clicked on colors[which]
+                        if(which == 0) {
+                            Intent intent = new Intent(Intent.ACTION_PICK,
+                                    MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                            intent.setType("image/*");
+                            startActivityForResult(intent, 1);
+                        }
+                        else if(which == 1) {
+                            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                            startActivityForResult(cameraIntent, 2);
+                        }
+                        else {
+                            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                            startActivityForResult(cameraIntent, 2);
+                        }
+                    }
+                });
+                builder.show();
+            }
+        });
         nameSignUpField = (EditText) findViewById(R.id.name_signup_field_id);
         emailSignUpField = (EditText) findViewById(R.id.email_signup_field_id);
         passwordSignUpField = (EditText) findViewById(R.id.password_signup_field_id);
         confirmPassSignUpField = (EditText) findViewById(R.id.password_confirm_signup_field_id);
-        signUpButton = (Button) findViewById(R.id.signup_button);
+        signUpButton = (Button) findViewById(R.id.sign_up_button);
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if(verifyAll(nameSignUpField.getText().toString(), emailSignUpField.getText().toString(), passwordSignUpField.getText().toString(), confirmPassSignUpField.getText().toString())) {
+                    pDialog.show();
+                    createUser(emailSignUpField.getText().toString(), passwordSignUpField.getText().toString());
+                }
             }
         });
 
+        //handles sign in process
+        emailField = (EditText) findViewById(R.id.email_field_id);
+        passwordField = (EditText) findViewById(R.id.password_field_id);
+        signInButton = (Button) findViewById(R.id.login_button);
+        signInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(verifyLogin(emailField.getText().toString(), passwordField.getText().toString())) {
+                    pDialog.show();
+                    loginUser(emailField.getText().toString(), passwordField.getText().toString());
+                }
+            }
+        });
 
+        //handles reset switch
+        resetView = (RelativeLayout) findViewById(R.id.pass_reset_view);
+        forgotPassSwitcherButton = (Button) findViewById(R.id.forgot_password_button);
+        forgotPassSwitcherButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resetView.setVisibility(View.VISIBLE);
+                signInView.setVisibility(View.GONE);
+                socialsView.setVisibility(View.GONE);
+            }
+        });
+
+        //handles forgot password
+        emailResetField = (EditText) findViewById(R.id.email_reset_field_id);
+        passResetButton = (Button) findViewById(R.id.reset_button);
+        passResetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(verifyReset(emailResetField.getText().toString())) {
+                    pDialog.show();
+                    resetPass(emailResetField.getText().toString());
+                }
+            }
+        });
+    }
+
+    public void resetPass(String email) {
+        mAuth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Snackbar.make(findViewById(android.R.id.content), "Reset email sent", Snackbar.LENGTH_SHORT).show();
+                            pDialog.dismiss();
+                            RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT);
+                            p.addRule(RelativeLayout.BELOW, R.id.sign_in_view);
+                            p.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                            p.setMargins(0, 10, 0, 0);
+
+                            socialsView.setLayoutParams(p);
+                            resetView.setVisibility(View.GONE);
+                            signInView.setVisibility(View.VISIBLE);
+                            socialsView.setVisibility(View.VISIBLE);
+                        }
+                        else {
+                            Snackbar.make(findViewById(android.R.id.content), "Reset email failed to send", Snackbar.LENGTH_SHORT).show();
+                            pDialog.dismiss();
+                        }
+                    }
+                });
+    }
+
+    public void loginUser(String email, String pass){
+        mAuth.signInWithEmailAndPassword(email, pass)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (!task.isSuccessful()) {
+                            Snackbar.make(findViewById(android.R.id.content), "Email or password incorrect", Snackbar.LENGTH_SHORT).show();
+                            pDialog.dismiss();
+                        }
+                    }
+                });
+    }
+
+    public void postCreateUser() {
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        try {
+            mDatabase.child("users").child(user.getUid()).child("reputation").setValue(0);
+
+            user.sendEmailVerification()
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Log.d("HB141Log", "Email sent.");
+                            }
+                        }
+                    });
+        }
+        catch (NullPointerException e) {
+            Log.e("HB141Log", "A nullpointer here really shouldn't have happened unless the user's email was never set... but then how was the user created?!? That would be a scary mystery. Let's hope this never happens");
+        }
+
+        pDialog.dismiss();
+        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+        finish();
+    }
+
+    public void finishCreateUser() {
+        try {
+            FirebaseUser user = mAuth.getCurrentUser();
+            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                    .setDisplayName(nameSignUpField.getText().toString())
+                    .build();
+
+            user.updateProfile(profileUpdates)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (!task.isSuccessful()) {
+                                SharedPreferences.Editor editor = sharedPref.edit();
+                                editor.putString(getString(R.string.displayname_sharedpref_key), nameSignUpField.getText().toString());
+                                editor.apply();
+                                Log.d("HB141Log", "User's incomplete data saved locally");
+                            } else {
+                                Log.d("HB141Log", "User's incomplete data saved online");
+                            }
+                            postCreateUser();
+                        }
+                    });
+        }
+        catch (Exception e) {
+            Toast.makeText(context, "Error: unable to finish user registration.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void finishCreateUser(final Uri propicUri) {
+        try {
+            FirebaseUser user = mAuth.getCurrentUser();
+            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                    .setDisplayName(nameSignUpField.getText().toString())
+                    .setPhotoUri(propicUri)
+                    .build();
+
+            user.updateProfile(profileUpdates)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (!task.isSuccessful()) {
+                                SharedPreferences.Editor editor = sharedPref.edit();
+                                editor.putString(getString(R.string.displayname_sharedpref_key), nameSignUpField.getText().toString());
+                                editor.putString(getString(R.string.imageUrl_sharedpref_key), propicUri.toString());
+                                editor.apply();
+                                Log.d("HB141Log", "User's data saved locally");
+                            } else {
+                                Log.d("HB141Log", "User's data saved online");
+                            }
+                            postCreateUser();
+                        }
+                    });
+        }
+        catch (Exception e) {
+            Toast.makeText(context, "Error: unable to finish user registration.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void createUser(String email, String pass) {
+        mAuth.createUserWithEmailAndPassword(email, pass)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(context, "Error: registration failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    public boolean verifyReset(String email) {
+        if(email.equals("")) {
+            Snackbar.make(findViewById(android.R.id.content), "Email is empty", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+        if(!email.contains("@") || !email.contains(".")) {
+            Snackbar.make(findViewById(android.R.id.content), "Email address is not valid", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean verifyLogin(String email, String pass) {
+        if(email.equals("")) {
+            Snackbar.make(findViewById(android.R.id.content), "Email is empty", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+        if(pass.equals("")) {
+            Snackbar.make(findViewById(android.R.id.content), "Password is empty", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+        if(!email.contains("@") || !email.contains(".")) {
+            Snackbar.make(findViewById(android.R.id.content), "Email address is not valid", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+        if(pass.length() <= 5) {
+            Snackbar.make(findViewById(android.R.id.content), "Password incorrect.", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean verifyAll(String name, String email, String pass, String confirmPass) {
+        if(name.equals("")) {
+            Snackbar.make(findViewById(android.R.id.content), "Name not completed", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+        if(email.equals("")) {
+            Snackbar.make(findViewById(android.R.id.content), "Email not completed", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+        if(pass.equals("")) {
+            Snackbar.make(findViewById(android.R.id.content), "Password not completed", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+        if(confirmPass.equals("")) {
+            Snackbar.make(findViewById(android.R.id.content), "Password confirm not completed", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+        if(!email.contains("@") || !email.contains(".")) {
+            Snackbar.make(findViewById(android.R.id.content), "Email address is not valid", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+        if(pass.length() <= 5) {
+            Snackbar.make(findViewById(android.R.id.content), "Password must be longer than 5 characters", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+        if(!pass.equals(confirmPass)) {
+            Snackbar.make(findViewById(android.R.id.content), "The passwords do not match", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+        if(!photoTaken) {
+            Snackbar.make(findViewById(android.R.id.content), "Profile picture not set", Snackbar.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(signUpView.getVisibility() == View.VISIBLE) {
+            RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            p.addRule(RelativeLayout.BELOW, R.id.sign_in_view);
+            p.addRule(RelativeLayout.CENTER_HORIZONTAL);
+            p.setMargins(0, 10, 0, 0);
+
+            socialsView.setLayoutParams(p);
+            signInView.setVisibility(View.VISIBLE);
+            signUpView.setVisibility(View.GONE);
+        }
+        else if(resetView.getVisibility() == View.VISIBLE) {
+            RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            p.addRule(RelativeLayout.BELOW, R.id.sign_in_view);
+            p.addRule(RelativeLayout.CENTER_HORIZONTAL);
+            p.setMargins(0, 10, 0, 0);
+
+            socialsView.setLayoutParams(p);
+            resetView.setVisibility(View.GONE);
+            signInView.setVisibility(View.VISIBLE);
+            socialsView.setVisibility(View.VISIBLE);
+        }
+        else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -103,6 +507,35 @@ public class LoginActivity extends Activity {
         super.onStop();
         if(mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode != Activity.RESULT_OK) {
+            Toast.makeText(context, "Error: did not return ok result.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(requestCode == 1) {
+            try {
+                Uri selectedImageUri = data.getData();
+                photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
+                mSignUpPropic.setImageBitmap(photo);
+                photoTaken = true;
+            }
+            catch (Exception e) {
+                Toast.makeText(context, "Error: file system returned null.", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (requestCode == 2) {
+            Bundle extras = data.getExtras();
+            if(extras != null) {
+                photo = (Bitmap) extras.get("data");
+                mSignUpPropic.setImageBitmap(photo);
+                photoTaken = true;
+            }
+            else {
+                Toast.makeText(context, "Error: camera returned null.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

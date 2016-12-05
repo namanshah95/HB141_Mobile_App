@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity
         if(mAuth.getCurrentUser() == null){ //check if the person is logged in
             //todo send the user through the onboarding/login process
             startActivity(new Intent(this, OnboardingActivity.class));
+            finish();
         }
         else if(returningFrom.equals("prevreports")){
             //set the fragment to Previous Reports
