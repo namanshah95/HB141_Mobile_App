@@ -218,31 +218,44 @@
             android:gravity="center"
             android:layout_below="@+id/sign_in_view">
 
-            <TextView
+            <View
                 android:id="@+id/orsignin"
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#ffffff"
+                android:layout_marginBottom="25dp"/>
+
+            <Button
+                android:id="@+id/gbutton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Or use the express lane"
-                android:textColor="@android:color/white"
-                android:textSize="15sp"
+                android:text="@string/common_signin_button_text_long"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif"
+                android:theme="@style/GOOButton"
+                android:layout_below="@+id/orsignin"
                 android:layout_centerHorizontal="true"/>
 
-            <ImageView
-                android:id="@+id/google_signin_button"
-                android:layout_width="100dp"
-                android:layout_height="20dp"
-                android:layout_margin="10dp"
-                android:layout_centerHorizontal="true"
-                android:background="@android:color/holo_red_light"
-                android:layout_below="@+id/orsignin"/>
+            <Button
+                android:id="@+id/fbbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/facebook_button_string"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif"
+                android:theme="@style/FBButton"
+                android:layout_margin="5dp"
+                android:layout_below="@id/gbutton"
+                android:layout_centerHorizontal="true"/>
 
-            <ImageView
-                android:id="@+id/facebook_signin_button"
-                android:layout_width="100dp"
-                android:layout_height="20dp"
+            <com.facebook.login.widget.LoginButton
+                android:visibility="gone"
+                android:id="@+id/facebooksignin_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:background="@android:color/holo_blue_light"
-                android:layout_below="@+id/google_signin_button"/>
+                android:layout_margin="5dp" />
 
         </RelativeLayout>
 

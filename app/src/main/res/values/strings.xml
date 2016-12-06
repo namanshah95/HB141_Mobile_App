@@ -7,6 +7,9 @@
     <string name="preference_file_key" translatable="false">com.epicintentions.hb141.PREFERENCE_FILE_KEY</string>
     <string name="displayname_sharedpref_key" translatable="false">com.epicintentions.hb141.displayName</string>
     <string name="imageUrl_sharedpref_key" translatable="false">com.epicintention.hb141.imageurl</string>
+    <string name="default_web_client_idd">490817557089-04abe9aldb3omkkolv2b8s4142omkotr.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">247633295650897</string>
+    <string name="fb_login_protocol_scheme">247633295650897</string>
 
     <!-- Drawer Header -->
     <string name="nav_header_maintitle_string" translatable="false">First Last</string>
@@ -33,6 +36,9 @@
     <string name="body_page2">Although slavery is commonly thought to be a thing of the past, human traffickers generate hundreds of billions of dollars in profits by trapping millions of people in horrific situations around the world, including here in the U.S. Traffickers use violence, threats, deception, debt bondage, and other manipulative tactics to force people to engage in commercial sex or to provide labor or services against their will.</string>
     <string name="body_page4">In the US, House Bill 141 exists to reduce human trafficking. It states that establishments with typically high risk of human trafficking must post notices with the National Human Trafficking Resource Center hotline. This hotline could potentially save someone from being trafficked, however many businesses do not comply with the law. There is no enforcement for the law. It is up to us to inspect these businesses for the notice.</string>
     <string name="body_page5">It\'s very simple. Open this app when you visit an establishment. Then find the establishment on the map. Finally fill out a quick survey about whether the hotline is visible. That\'s it, we\'ll take it from there. Ready to get started?</string>
+
+    <!-- Login Activity -->
+    <string name="facebook_button_string">Sign in with Facebook</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

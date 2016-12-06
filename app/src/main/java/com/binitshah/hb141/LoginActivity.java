@@ -13,6 +13,7 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,17 +27,34 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -49,12 +67,13 @@ import java.io.InputStream;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class LoginActivity extends Activity {
+public class LoginActivity extends FragmentActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private Context context;
     private SharedPreferences sharedPref;
     private FirebaseStorage storage;
     private ProgressDialog pDialog;
+    private final String TAG = "HB141Log";
 
     //switchers
     private RelativeLayout signInView;
@@ -85,6 +104,11 @@ public class LoginActivity extends Activity {
     //password reset
     private EditText emailResetField;
     private Button passResetButton;
+
+    //socials login
+    private GoogleApiClient mGoogleApiClient; //google
+    private CallbackManager mCallbackManager; //fb
+    private LoginButton fbloginButton; //fb
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +150,7 @@ public class LoginActivity extends Activity {
                 FirebaseUser user = mFirebaseAuth.getCurrentUser();
                 if(user != null) {
                     //user has signed in
-                    Log.d("HB141Log", "User has signed in");
+                    Log.d(TAG, "User has signed in");
                     if(photoTaken) {//we know that if photo was set, that the user when through the flow of signing up
                         StorageReference storageRef = storage.getReferenceFromUrl("gs://hb141-2fc0d.appspot.com");
                         StorageReference userpropic = storageRef.child("propics/" + user.getUid() + "-propic.jpg");
@@ -147,7 +171,7 @@ public class LoginActivity extends Activity {
                                     photo.compress(Bitmap.CompressFormat.JPEG, 100, out);
                                     out.flush();
                                     out.close();
-                                    Log.d("HB141Log", "Bitmap was saved locally.");
+                                    Log.d(TAG, "Bitmap was saved locally.");
                                     finishCreateUser();
                                 }
                                 catch (Exception ex) {
@@ -158,7 +182,7 @@ public class LoginActivity extends Activity {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 Uri propicUri = taskSnapshot.getDownloadUrl();
-                                Log.d("HB141Log", "Bitmap was saved online at" + propicUri.toString());
+                                Log.d(TAG, "Bitmap was saved online at" + propicUri.toString());
                                 finishCreateUser(propicUri);
                             }
                         });
@@ -257,6 +281,120 @@ public class LoginActivity extends Activity {
                 }
             }
         });
+
+        //handles facebook login
+        fbloginButton = (LoginButton) findViewById(R.id.facebooksignin_button);
+        fbloginButton.setVisibility(View.GONE);
+        fbloginButton.setReadPermissions("email", "public_profile");
+        mCallbackManager = CallbackManager.Factory.create();
+        fbloginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d(TAG, "facebook:onSuccess:" + loginResult);
+                firebaseAuthWithFacebook(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d(TAG, "facebook:onCancel");
+                Toast.makeText(LoginActivity.this, "Facebook login cancelled.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.d(TAG, "facebook:onError", error);
+                Toast.makeText(LoginActivity.this, "Error: unable to login with facebook.", Toast.LENGTH_SHORT).show();
+            }
+        });
+        Button fbButton = (Button) findViewById(R.id.fbbutton);
+        fbButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fbloginButton.performClick();
+            }
+        });
+
+        //handles google login
+        Button gButton = (Button) findViewById(R.id.gbutton);
+        gButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                startActivityForResult(signInIntent, 3);
+            }
+        });
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_idd))
+                .requestEmail()
+                .build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+    }
+
+    public void postSocialsUser() {
+        final FirebaseUser user = mAuth.getCurrentUser();
+
+        try {
+            DatabaseReference ref = mDatabase.child("users").child(user.getUid()).child("reputation");
+            ValueEventListener postListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Object rep = dataSnapshot.getValue();
+                    if(rep == null) {
+                        mDatabase.child("users").child(user.getUid()).child("reputation").setValue(0);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Getting Post failed, log a message
+                    Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                    // ...
+                }
+            };
+            ref.addListenerForSingleValueEvent(postListener);
+        }
+        catch (NullPointerException e) {
+            Log.e(TAG, "Nullpointer where we check the the social user rep.");
+        }
+    }
+
+    //FACEBOOK
+    private void firebaseAuthWithFacebook(AccessToken token) {
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "signInWithCredential", task.getException()); //todo remove at release
+                            String errorUnableToSignIn = "Unable to login with Facebook"; //todo change to getString
+                            Toast.makeText(LoginActivity.this, errorUnableToSignIn, Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            postSocialsUser();
+                        }
+                    }
+                });
+    }
+
+    //GOOGLE
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "signInWithCredential", task.getException()); //todo remove at release
+                            String errorUnableToSignIn = "Unable to login with Google"; //todo change to getString
+                            Toast.makeText(LoginActivity.this, errorUnableToSignIn, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     public void resetPass(String email) {
@@ -310,13 +448,13 @@ public class LoginActivity extends Activity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                Log.d("HB141Log", "Email sent.");
+                                Log.d(TAG, "Email sent.");
                             }
                         }
                     });
         }
         catch (NullPointerException e) {
-            Log.e("HB141Log", "A nullpointer here really shouldn't have happened unless the user's email was never set... but then how was the user created?!? That would be a scary mystery. Let's hope this never happens");
+            Log.e(TAG, "A nullpointer here really shouldn't have happened unless the user's email was never set... but then how was the user created?!? That would be a scary mystery. Let's hope this never happens");
         }
 
         pDialog.dismiss();
@@ -339,9 +477,9 @@ public class LoginActivity extends Activity {
                                 SharedPreferences.Editor editor = sharedPref.edit();
                                 editor.putString(getString(R.string.displayname_sharedpref_key), nameSignUpField.getText().toString());
                                 editor.apply();
-                                Log.d("HB141Log", "User's incomplete data saved locally");
+                                Log.d(TAG, "User's incomplete data saved locally");
                             } else {
-                                Log.d("HB141Log", "User's incomplete data saved online");
+                                Log.d(TAG, "User's incomplete data saved online");
                             }
                             postCreateUser();
                         }
@@ -369,9 +507,9 @@ public class LoginActivity extends Activity {
                                 editor.putString(getString(R.string.displayname_sharedpref_key), nameSignUpField.getText().toString());
                                 editor.putString(getString(R.string.imageUrl_sharedpref_key), propicUri.toString());
                                 editor.apply();
-                                Log.d("HB141Log", "User's data saved locally");
+                                Log.d(TAG, "User's data saved locally");
                             } else {
-                                Log.d("HB141Log", "User's data saved online");
+                                Log.d(TAG, "User's data saved online");
                             }
                             postCreateUser();
                         }
@@ -510,11 +648,21 @@ public class LoginActivity extends Activity {
         }
     }
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        String googleServiceErrorMessage = "Error: unable to login with Google."; //todo: change to getString
+        Toast.makeText(this, googleServiceErrorMessage, Toast.LENGTH_SHORT).show();
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode != Activity.RESULT_OK) {
             Toast.makeText(context, "Error: did not return ok result.", Toast.LENGTH_SHORT).show();
             return;
         }
+        mCallbackManager.onActivityResult(requestCode, resultCode, data); //facebook part
         if(requestCode == 1) {
             try {
                 Uri selectedImageUri = data.getData();
@@ -526,7 +674,7 @@ public class LoginActivity extends Activity {
                 Toast.makeText(context, "Error: file system returned null.", Toast.LENGTH_SHORT).show();
             }
         }
-        else if (requestCode == 2) {
+        else if(requestCode == 2) {
             Bundle extras = data.getExtras();
             if(extras != null) {
                 photo = (Bitmap) extras.get("data");
@@ -535,6 +683,18 @@ public class LoginActivity extends Activity {
             }
             else {
                 Toast.makeText(context, "Error: camera returned null.", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (requestCode == 3) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (result.isSuccess()) {
+                // Successful Google Sign In
+                GoogleSignInAccount account = result.getSignInAccount();
+                firebaseAuthWithGoogle(account);
+            } else {
+                // Failed Google Sign In
+                String errorUnableToSignIn = "Unable to sign in with Google."; //todo: change to getString
+                Toast.makeText(LoginActivity.this, errorUnableToSignIn, Toast.LENGTH_SHORT).show();
             }
         }
     }
