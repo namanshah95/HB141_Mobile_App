@@ -69,11 +69,18 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class LoginActivity extends FragmentActivity implements GoogleApiClient.OnConnectionFailedListener {
 
+    //todo: replace all toasts with snackbars
+    //todo: replace all hardcoded strings in errors
+    //todo: use your string resource file for xmls too
+
     private Context context;
     private SharedPreferences sharedPref;
     private FirebaseStorage storage;
     private ProgressDialog pDialog;
     private final String TAG = "HB141Log";
+    private final int FILE_SYSTEM_REQUEST_CODE = 1;
+    private final int CAMERA_REQUEST_CODE = 2;
+    private final int GOOGLE_SIGN_IN_REQUEST_CODE = 3;
 
     //switchers
     private RelativeLayout signInView;
@@ -182,7 +189,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 Uri propicUri = taskSnapshot.getDownloadUrl();
-                                Log.d(TAG, "Bitmap was saved online at" + propicUri.toString());
+                                Log.d(TAG, "Bitmap was saved online at " + propicUri.toString());
                                 finishCreateUser(propicUri);
                             }
                         });
@@ -213,15 +220,15 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
                             Intent intent = new Intent(Intent.ACTION_PICK,
                                     MediaStore.Images.Media.INTERNAL_CONTENT_URI);
                             intent.setType("image/*");
-                            startActivityForResult(intent, 1);
+                            startActivityForResult(intent, FILE_SYSTEM_REQUEST_CODE);
                         }
                         else if(which == 1) {
                             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                            startActivityForResult(cameraIntent, 2);
+                            startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
                         }
                         else {
                             Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                            startActivityForResult(cameraIntent, 2);
+                            startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
                         }
                     }
                 });
@@ -320,7 +327,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
             @Override
             public void onClick(View v) {
                 Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-                startActivityForResult(signInIntent, 3);
+                startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST_CODE);
             }
         });
 
@@ -335,24 +342,22 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
     }
 
     public void postSocialsUser() {
-        final FirebaseUser user = mAuth.getCurrentUser();
+        FirebaseUser user = mAuth.getCurrentUser();
 
         try {
-            DatabaseReference ref = mDatabase.child("users").child(user.getUid()).child("reputation");
+            final DatabaseReference ref = mDatabase.child("users").child(user.getUid()).child("reputation");
             ValueEventListener postListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Object rep = dataSnapshot.getValue();
                     if(rep == null) {
-                        mDatabase.child("users").child(user.getUid()).child("reputation").setValue(0);
+                        ref.setValue(0);
                     }
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    // Getting Post failed, log a message
-                    Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                    // ...
+                    Log.w(TAG, "Getting data from firebase database failed.", databaseError.toException());
                 }
             };
             ref.addListenerForSingleValueEvent(postListener);
@@ -393,6 +398,9 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
                             String errorUnableToSignIn = "Unable to login with Google"; //todo change to getString
                             Toast.makeText(LoginActivity.this, errorUnableToSignIn, Toast.LENGTH_SHORT).show();
                         }
+                        else {
+                            postSocialsUser();
+                        }
                     }
                 });
     }
@@ -417,7 +425,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
                             socialsView.setVisibility(View.VISIBLE);
                         }
                         else {
-                            Snackbar.make(findViewById(android.R.id.content), "Reset email failed to send", Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(findViewById(android.R.id.content), "No such account exists", Snackbar.LENGTH_SHORT).show();
                             pDialog.dismiss();
                         }
                     }
@@ -457,9 +465,12 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
             Log.e(TAG, "A nullpointer here really shouldn't have happened unless the user's email was never set... but then how was the user created?!? That would be a scary mystery. Let's hope this never happens");
         }
 
-        pDialog.dismiss();
-        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-        finish();
+        //pDialog.dismiss();
+        //startActivity(new Intent(LoginActivity.this, MainActivity.class));
+        //finish(); See, this is where you would think that we would want to switch over to the mainactivity. except guess what bitch, firebase hates you. so fuck you, instead we're going to be super counterintiutive. we're gonna sign out and then back in. that'll show you bitch. for real tho, i think that if we do this, then the FirebaseAuth will be forced to refresh or something and actually load the data.
+        FirebaseAuth.getInstance().signOut();
+        photoTaken = false;
+        loginUser(emailSignUpField.getText().toString(), passwordSignUpField.getText().toString());
     }
 
     public void finishCreateUser() {
@@ -491,6 +502,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
     }
 
     public void finishCreateUser(final Uri propicUri) {
+        Log.d(TAG, "In finishCreateUser with uri:" + propicUri.toString());
         try {
             FirebaseUser user = mAuth.getCurrentUser();
             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
@@ -526,8 +538,8 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (!task.isSuccessful()) {
-                            Toast.makeText(context, "Error: registration failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            Snackbar.make(findViewById(android.R.id.content), "Email address taken already", Snackbar.LENGTH_SHORT).show();
+                            pDialog.dismiss();
                         }
                     }
                 });
@@ -659,11 +671,11 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode != Activity.RESULT_OK) {
-            Toast.makeText(context, "Error: did not return ok result.", Toast.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(android.R.id.content), "Did not receive expected result", Snackbar.LENGTH_SHORT).show();
             return;
         }
         mCallbackManager.onActivityResult(requestCode, resultCode, data); //facebook part
-        if(requestCode == 1) {
+        if(requestCode == FILE_SYSTEM_REQUEST_CODE) {
             try {
                 Uri selectedImageUri = data.getData();
                 photo = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
@@ -674,7 +686,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
                 Toast.makeText(context, "Error: file system returned null.", Toast.LENGTH_SHORT).show();
             }
         }
-        else if(requestCode == 2) {
+        else if(requestCode == CAMERA_REQUEST_CODE) {
             Bundle extras = data.getExtras();
             if(extras != null) {
                 photo = (Bitmap) extras.get("data");
@@ -685,7 +697,7 @@ public class LoginActivity extends FragmentActivity implements GoogleApiClient.O
                 Toast.makeText(context, "Error: camera returned null.", Toast.LENGTH_SHORT).show();
             }
         }
-        else if (requestCode == 3) {
+        else if (requestCode == GOOGLE_SIGN_IN_REQUEST_CODE) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
                 // Successful Google Sign In
