@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity
     Toolbar toolbar;
     private NavigationView navigationView;
     boolean hideMenu = false;
-    private final String TAG = "HB141Log";
+    private static final String TAG = "HB141Log";
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     public static final int NAV_CHOOSE_LOCATION = 0;
     public static final int NAV_PREVIOUS_REPORTS = 1;
@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity
 
                     //download the profile picture from firebase
                     try {
-                        new DownloadImageTask(propic).execute(user.getPhotoUrl().toString());
+                        new DownloadProPic(propic).execute(user.getPhotoUrl().toString());
                     }
                     catch (NullPointerException e) {
                         Snackbar.make(findViewById(android.R.id.content), "Unable to retrieve user data", Snackbar.LENGTH_SHORT).show();
@@ -308,11 +308,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+    private class DownloadProPic extends AsyncTask<String, Void, Bitmap> {
         CircleImageView propicImageView;
         String propicUrl;
 
-        DownloadImageTask(CircleImageView propicImageViewHolder) {
+        DownloadProPic(CircleImageView propicImageViewHolder) {
             this.propicImageView = propicImageViewHolder;
         }
 

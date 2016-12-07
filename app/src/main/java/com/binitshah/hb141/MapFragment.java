@@ -217,7 +217,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
         snapHelper.attachToRecyclerView(establishment_rv);
         establishment_rv.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
 
-        SnapRecyclerAdapter adapter = new SnapRecyclerAdapter(context, establishments);
+        SnapRecyclerAdapter adapter = new SnapRecyclerAdapter(context, establishments, mGoogleApiClient);
         establishment_rv.setAdapter(adapter);
 
         pDialog.dismiss();

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/establishment_cardview"
     android:layout_width="match_parent"
     android:layout_height="190dp"
     android:layout_marginBottom="10dp"
     android:layout_marginEnd="10dp"
-    android:layout_marginStart="10dp">
+    android:layout_marginStart="10dp"
+    android:background="@android:color/white">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -13,15 +15,16 @@
         <ImageView
             android:id="@+id/establishment_background"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:background="@android:color/holo_green_light"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:background="@color/cardview_dark_background"
             android:contentDescription="Establishment background" />
 
         <TextView
             android:id="@+id/establishment_attribution"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
             android:layout_alignBottom="@+id/establishment_background"
             android:text="Photo by First Last"
             android:textColor="@color/colorDarkenTint"
@@ -33,10 +36,9 @@
             android:id="@+id/establishment_inspect_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/establishment_background"
+            android:layout_alignBottom="@+id/establishment_background"
             android:layout_alignParentEnd="true"
-            android:text="Inspect"
-            style="@style/Widget.AppCompat.Button.Colored"/>
+            android:text="Inspect" />
 
         <RelativeLayout
             android:layout_width="wrap_content"
