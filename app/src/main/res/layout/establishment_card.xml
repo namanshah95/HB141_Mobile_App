@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="190dp"
+    android:layout_marginBottom="10dp"
+    android:layout_marginEnd="10dp"
+    android:layout_marginStart="10dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/establishment_background"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:background="@android:color/holo_green_light"
+            android:contentDescription="Establishment background" />
+
+        <TextView
+            android:id="@+id/establishment_attribution"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignBottom="@+id/establishment_background"
+            android:text="Photo by First Last"
+            android:textColor="@color/colorDarkenTint"
+            android:textSize="10sp"
+            android:fontFamily="san-serif-light"
+            android:layout_margin="5dp"/>
+
+        <Button
+            android:id="@+id/establishment_inspect_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/establishment_background"
+            android:layout_alignParentEnd="true"
+            android:text="Inspect"
+            style="@style/Widget.AppCompat.Button.Colored"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorDarkenTint"
+            android:layout_marginTop="7.5dp"
+            android:paddingTop="7.5dp"
+            android:paddingBottom="7.5dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp">
+
+            <TextView
+                android:id="@+id/establishment_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Example Name"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-black"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/establishment_types"
+                android:layout_below="@+id/establishment_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Food | Bar | Entertainment"
+                android:layout_alignParentStart="true"
+                android:textColor="@android:color/white"
+                android:fontFamily="sans-serif-light"
+                android:textSize="12sp"/>
+
+        </RelativeLayout>
+
+        <!--
+        <TextView
+            android:id="@+id/establishment_previous_report_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Example Name"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-black"
+            android:textSize="20sp" />
+            THIS IS TO BE USED WHEN WE IMPLEMENT THE FEATURE WHERE USERS CAN SEE WHETHER A PLACE HAS BEEN SURVEYED BEFORE
+            -->
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

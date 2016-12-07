@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -52,13 +53,17 @@ import java.io.InputStream;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, DetailFragment.OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     Toolbar toolbar;
     private NavigationView navigationView;
     boolean hideMenu = false;
     private final String TAG = "HB141Log";
-    private final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    public static final int NAV_CHOOSE_LOCATION = 0;
+    public static final int NAV_PREVIOUS_REPORTS = 1;
+    public static final int NAV_MORE_INFO = 2;
+    public static final int NAV_SETTINGS = 3;
     Context context;
 
 
@@ -73,6 +78,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(getResources().getString(R.string.nav_chooselocation_string));
         setSupportActionBar(toolbar);
 
         mAuth = FirebaseAuth.getInstance();
@@ -121,7 +127,7 @@ public class MainActivity extends AppCompatActivity
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             Object rep = dataSnapshot.getValue();
                             if(rep != null) {
-                                subtitle.setText(subtitle.getText() + " | " + rep.toString() + " Points");
+                                subtitle.setText(subtitle.getText() + " | " + rep.toString() + " points");
                             }
                         }
 
@@ -162,38 +168,28 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void switchNavToProperFragment() {
-        String returningFrom = "nothing"; //todo modify by checking the Intent for an extraString value
-        FragmentTransaction ft;
-        switch (returningFrom) {
-            case "prevreports":
-                //set the fragment to Previous Reports
-                toolbar.setTitle(getResources().getString(R.string.nav_prevreports_string));
-                navigationView.setCheckedItem(R.id.nav_prevreports_id);
-                ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame_id, new PreviousReportsFragment());
-                ft.commit();
-                hideMenu = true;
-                invalidateOptionsMenu();
+        int returnCode = NAV_CHOOSE_LOCATION; //todo modify by checking the Intent for an extraInt value
+
+        switch (returnCode) {
+            case NAV_CHOOSE_LOCATION:
+                onNavigationItemSelected(navigationView.getMenu().getItem(NAV_CHOOSE_LOCATION));
+                navigationView.setCheckedItem(R.id.nav_chooselocation_id);
                 break;
-            case "settings":
-                //set the fragment to Settings
-                toolbar.setTitle(getResources().getString(R.string.nav_settings_string));
+            case NAV_PREVIOUS_REPORTS:
+                onNavigationItemSelected(navigationView.getMenu().getItem(NAV_PREVIOUS_REPORTS));
+                navigationView.setCheckedItem(R.id.nav_prevreports_id);
+                break;
+            case NAV_MORE_INFO:
+                onNavigationItemSelected(navigationView.getMenu().getItem(NAV_MORE_INFO));
+                navigationView.setCheckedItem(R.id.nav_moreinfo_id);
+                break;
+            case NAV_SETTINGS:
+                onNavigationItemSelected(navigationView.getMenu().getItem(NAV_SETTINGS));
                 navigationView.setCheckedItem(R.id.nav_settings_id);
-                ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame_id, new SettingsFragment());
-                ft.commit();
-                hideMenu = true;
-                invalidateOptionsMenu();
                 break;
             default:
-                //default is to set the fragment to Maps Fragment
-                toolbar.setTitle(getResources().getString(R.string.nav_chooselocation_string));
+                onNavigationItemSelected(navigationView.getMenu().getItem(NAV_CHOOSE_LOCATION));
                 navigationView.setCheckedItem(R.id.nav_chooselocation_id);
-                ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame_id, new MapFragment());
-                ft.commit();
-                hideMenu = false;
-                invalidateOptionsMenu();
                 break;
         }
     }
@@ -214,30 +210,37 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = null;
         int id = item.getItemId();
 
-        if (id == R.id.nav_chooselocation_id) {
-            toolbar.setTitle(getResources().getString(R.string.nav_chooselocation_string));
-            hideMenu = false;
-            fragment = new MapFragment();
-        } else if (id == R.id.nav_prevreports_id) {
-            hideMenu = true;
-            toolbar.setTitle(getResources().getString(R.string.nav_prevreports_string));
-            fragment = new PreviousReportsFragment();
-        } else if (id == R.id.nav_moreinfo_id) {
-            hideMenu = true;
-            toolbar.setTitle(getResources().getString(R.string.nav_moreinfo_string));
-            fragment = new InfoFragment();
-        } else if (id == R.id.nav_settings_id) {
-            hideMenu = true;
-            toolbar.setTitle(getResources().getString(R.string.nav_settings_string));
-            fragment = new SettingsFragment();
-        } else if (id == R.id.nav_signout_id) {
+        switch (item.getItemId()) {
+            case R.id.nav_chooselocation_id:
+                toolbar.setTitle(getResources().getString(R.string.nav_chooselocation_string));
+                hideMenu = false;
+                fragment = new MapFragment();
+                break;
+            case R.id.nav_prevreports_id:
+                hideMenu = true;
+                toolbar.setTitle(getResources().getString(R.string.nav_prevreports_string));
+                fragment = new PreviousReportsFragment();
+                break;
+            case R.id.nav_moreinfo_id:
+                hideMenu = true;
+                toolbar.setTitle(getResources().getString(R.string.nav_moreinfo_string));
+                fragment = new InfoFragment();
+                break;
+            case R.id.nav_settings_id:
+                hideMenu = true;
+                toolbar.setTitle(getResources().getString(R.string.nav_settings_string));
+                fragment = new SettingsFragment();
+                break;
+        }
+
+        /*
             hideMenu = true;
             FirebaseAuth.getInstance().signOut();
             LoginManager.getInstance().logOut();
             //delete other locally saved data
             startActivity(new Intent(MainActivity.this, OnboardingActivity.class));
             finish();
-        }
+         */
 
         if (fragment != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -263,16 +266,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.search_location:
                 try {
                     Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).build(this);
                     startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-                } catch (GooglePlayServicesRepairableException e) {
-                    //TODO: Handle Error
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    //TODO: Handle exception
+                } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                    Log.e(TAG, "Google Play Error", e);
                 }
                 return true;
             default:
@@ -282,57 +282,21 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
                 place = PlaceAutocomplete.getPlace(this, data);
-
-                mDatabase.child("establishment").child(place.getId()).child("Name").setValue(place.getName().toString());
-                mDatabase.child("establishment").child(place.getId()).child("Address").setValue(place.getAddress().toString());
-                mDatabase.child("establishment").child(place.getId()).child("Phone Number").setValue(place.getPhoneNumber().toString());
-                mDatabase.child("establishment").child(place.getId()).child("Website").setValue(place.getWebsiteUri().toString());
-                mDatabase.child("establishment").child(place.getId()).child("Place Type").setValue(place.getPlaceTypes());
-
-                // /MapFragment fragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
-                //fragment.updateMapViewPort(place.getViewport());
-
-            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
-                Status status = PlaceAutocomplete.getStatus(this, data);
-                // TODO: Handle the error.
-//                Log.i(TAG, status.getStatusMessage());
-
-            } else if (resultCode == RESULT_CANCELED) {
-                // The user canceled the operation.
+                Log.d(TAG, "Place data: " + place + " | " + place.getId() + place.getAddress());
             }
+        } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+            Status status = PlaceAutocomplete.getStatus(this, data);
+            Log.i(TAG, status.getStatusMessage());
+            Snackbar.make(findViewById(android.R.id.content), "Unable to retrieve search results", Snackbar.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        if (place != null) {
-            toolbar.setTitle(place.getName().toString());
-
-            Bundle bundle = new Bundle();
-            bundle.putString("eid", place.getId());
-            DetailFragment detailFragment = new DetailFragment();
-            detailFragment.setArguments(bundle);
-
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame_id, detailFragment);
-            ft.commit();
-            hideMenu = true;
-            invalidateOptionsMenu();
-        }
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
     }
 

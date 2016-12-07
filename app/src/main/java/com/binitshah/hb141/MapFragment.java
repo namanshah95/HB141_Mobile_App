@@ -1,25 +1,33 @@
 package com.binitshah.hb141;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSnapHelper;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -27,10 +35,15 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceLikelihood;
+import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
+import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,6 +53,10 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -52,33 +69,35 @@ import static android.content.Context.LOCATION_SERVICE;
  */
 public class MapFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-//    private static final String TAG = ;
-    final String LOG = "HB141Log";
+    private final String TAG = "HB141Log";
+    Establishment establishment;
+    Context context;
+    private Handler mHandler = new Handler();
+    ArrayList<Establishment> establishments = new ArrayList<>();
+    private ProgressDialog pDialog;
+    private RecyclerView establishment_rv;
 
     //Places API
-    Context context;
     protected GoogleApiClient mGoogleApiClient;
-    protected LatLng mLastLocation;
-    int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
 
     //Maps API
     MapView mMapView;
     GoogleMap googleMap;
 
     //Locations API
-    private Location mLocation;
-    private LocationManager locationManager;
-    private LocationRequest mLocationRequest;
+    private static final int FINE_LOCATION_PERMISSION_REQUEST_CODE = 3;
 
-    //Location
-    LocationManager mLocationManager;
-    long TIME = 10000; //every ten seconds
-    float DISTANCE = 3; //every three meters
-    private static final int PERMISSION_REQUEST_CODE = 1;
-
-    public MapFragment() {
-        // Required empty public constructor
+    public static MapFragment newInstance(Establishment establishmentHolder) {
+        MapFragment mMapFragment = new MapFragment();
+        mMapFragment.setEstablishment(establishmentHolder);
+        return mMapFragment;
     }
+
+    public void setEstablishment(Establishment establishmentHolder) {
+        this.establishment = establishmentHolder;
+    }
+
+    public MapFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -90,14 +109,18 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 
-        //this segment will initialize the mapview
-        mMapView = (MapView) v.findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
-        mMapView.onResume();// needed to get the map to display immediately
+        pDialog = new ProgressDialog(getActivity());
+        pDialog.setMessage("Finding nearby establishments...");
+        establishment_rv = (RecyclerView) v.findViewById(R.id.establishment_recyclerview);
+
         try {
-            MapsInitializer.initialize(getActivity().getApplicationContext());
+            //this segment will initialize the mapview
+            mMapView = (MapView) v.findViewById(R.id.mapView);
+            mMapView.onCreate(savedInstanceState);
+            mMapView.onResume();// needed to get the map to display immediately
+            MapsInitializer.initialize(context);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Darn", e);
         }
 
         //then this segment uses the mapview to create a googlemap
@@ -105,78 +128,125 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
             @Override
             public void onMapReady(GoogleMap readyMap) {
                 googleMap = readyMap;
-                System.out.println("Map is ready");
+                Log.d(TAG, "Map is ready.");
                 googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 googleMap.setBuildingsEnabled(true);
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(33.762909, -84.422675), 6)); //defaults to atlanta
             }
         });
 
         //this segment initializes the googleapiclient for places api use
         buildGoogleApiClient();
 
-
-        mLocationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
-
-        if(!checkLocationPermission()) {
-            Log.d(LOG, "GPS Location: " + checkLocationPermission());
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSION_REQUEST_CODE);
+        if(establishment == null) {
+            getNearbyPlaces();
         }
-        else{
-            Log.d(LOG, "GPS Location: " + checkLocationPermission());
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME, DISTANCE, mLocationListener);
-        }
-
-
 
         return v;
     }
 
-    private boolean checkLocationPermission() {
-        int permissionCheckFine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-        int permissionCheckCoarse = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-        return permissionCheckFine == PackageManager.PERMISSION_GRANTED || permissionCheckCoarse == PackageManager.PERMISSION_GRANTED;
+    private void getNearbyPlaces() {
+        if(ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            pDialog.show();
+            PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi.getCurrentPlace(mGoogleApiClient, null);
+            result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+                @Override
+                public void onResult(@NonNull PlaceLikelihoodBuffer placeLikelihoods) {
+                    for (PlaceLikelihood placeLikelihood : placeLikelihoods) {
+                        Log.d(TAG, "unsorted:" + placeLikelihood.getPlace().getName() + " | " + placeLikelihood.getLikelihood());
+                        Place place = placeLikelihood.getPlace();
+                        String address = null;
+                        String attributions = null;
+                        String phoneNumber = null;
+                        if(place.getAddress() != null) {
+                            address = place.getAddress().toString();
+                        }
+                        if(place.getAttributions() != null) {
+                            attributions = place.getAttributions().toString();
+                        }
+                        if(place.getPhoneNumber() != null) {
+                            phoneNumber = place.getPhoneNumber().toString();
+                        }
+
+                        Establishment establishment = new Establishment(
+                                address,
+                                attributions,
+                                place.getId(),
+                                place.getLatLng(),
+                                place.getLocale(),
+                                place.getName().toString(),
+                                phoneNumber,
+                                place.getPlaceTypes(),
+                                place.getViewport(),
+                                place.getWebsiteUri(),
+                                placeLikelihood.getLikelihood()
+                        );
+                        establishments.add(establishment);
+                    }
+                    placeLikelihoods.release();
+                    createEstablishmentsViewPager();
+                }
+            });
+        }
+        else {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_PERMISSION_REQUEST_CODE);
+        }
     }
 
-    //Location
-    LocationListener mLocationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(final Location location) {
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 14));
+    private void createEstablishmentsViewPager() {
+        //let's first sort the establishments by likelihood
+        Collections.sort(establishments, new Comparator<Establishment>() {
+            public int compare(Establishment a, Establishment b) {
+                if(a.getLikelihood() < b.getLikelihood()) {
+                    return 1;
+                }
+                else if(b.getLikelihood() > a.getLikelihood()) {
+                    return -1;
+                }
+                else {
+                    return 0;
+                }
+            }
+        });
+        for(Establishment establishment : establishments) {
+            Log.d(TAG, "Sorted Establishment" + establishment.getName() + " | likelihood: " + establishment.getLikelihood());
         }
 
-        @Override
-        public void onStatusChanged(String string, int someint, Bundle bundle){
+        establishment_rv.setVisibility(View.VISIBLE);
+        establishment_rv.setHasFixedSize(true);
+        SnapHelper snapHelper = new LinearSnapHelper();
+        snapHelper.attachToRecyclerView(establishment_rv);
+        establishment_rv.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
 
-        }
+        SnapRecyclerAdapter adapter = new SnapRecyclerAdapter(context, establishments);
+        establishment_rv.setAdapter(adapter);
 
-        @Override
-        public void onProviderEnabled(String string){
-
-        }
-
-        @Override
-        public void onProviderDisabled(String string){
-
-        }
-    };
+        pDialog.dismiss();
+    }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        Log.d(LOG,"Request Code: " + requestCode);
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
-            case PERMISSION_REQUEST_CODE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted
-                    if(checkLocationPermission()) {
-                        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME, DISTANCE, mLocationListener);
-                    }
+            case FINE_LOCATION_PERMISSION_REQUEST_CODE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getNearbyPlaces();
+                }
+                else {
+                    final Snackbar snackbar = Snackbar.make(getActivity().findViewById(android.R.id.content), "Without the location permission, we cannot detect establishments around you. Please search for your current location.", Snackbar.LENGTH_INDEFINITE);
+                    snackbar.setAction("Provide Permission", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_PERMISSION_REQUEST_CODE);
+                        }
+                    });
+                    View sbView = snackbar.getView();
+                    TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+                    textView.setMaxLines(5);
+                    snackbar.show();
+                    mHandler.postDelayed(new Runnable() {
+                        public void run() {
+                            snackbar.dismiss();
+                        }
+                    }, 5000);
                 }
             }
         }
@@ -202,7 +272,6 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     public void onDestroy(){
         super.onDestroy();
         mMapView.onDestroy();
-        //mGoogleApiClient.stopAutoManage(getActivity());
         mGoogleApiClient.disconnect();
     }
 
@@ -218,8 +287,6 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                 .Builder(context)
                 .addApi(Places.GEO_DATA_API)
                 .addApi(Places.PLACE_DETECTION_API)
-                .addApi(LocationServices.API)
-                //.enableAutoManage(getActivity(), this)
                 .build();
     }
 
@@ -227,17 +294,17 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     //callbacks for the googleapiclient
     @Override
     public void onConnected(@Nullable Bundle bundle){
-        Log.d(LOG, "CONNECTION CONNECTED");
+        Log.d(TAG, "CONNECTION CONNECTED");
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.d(LOG, "CONNECTION SUSPENDED: " + String.valueOf(i));
+        Log.d(TAG, "CONNECTION SUSPENDED: " + String.valueOf(i));
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d(LOG, "CONNECTION FAILED: " + connectionResult.getErrorMessage());
+        Log.d(TAG, "CONNECTION FAILED: " + connectionResult.getErrorMessage());
     }
 
     public void onStart() {
@@ -247,17 +314,10 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     }
 
     public void onStop() {
+        super.onStop();
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
-        super.onStop();
     }
-
-    public void updateMapViewPort(LatLngBounds latLng) {
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLng, 0));
-    }
-
-
-
 }
 
