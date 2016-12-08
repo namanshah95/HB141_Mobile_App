@@ -8,7 +8,6 @@ import java.util.List;
 
 public class Report {
 
-    List<Integer> placeTypes;
     String placeId;
     String volunteerId;
     String dateVisited;

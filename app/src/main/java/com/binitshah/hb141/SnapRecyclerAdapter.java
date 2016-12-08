@@ -1,6 +1,7 @@
 package com.binitshah.hb141;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -66,7 +67,7 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Reycl
         holder.establishmentInspectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context, "ID: " + establishment.getId(), Toast.LENGTH_SHORT).show();
+
             }
         });
 
