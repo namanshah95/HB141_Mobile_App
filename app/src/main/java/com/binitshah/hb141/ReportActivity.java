@@ -21,6 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /*
 * ReportActivity can be started two ways. In either read mode or write mode.
@@ -35,7 +36,15 @@ public class ReportActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     DatabaseReference mDatabase;
 
-    private String EID;
+    private TextView mLocationName;
+    private TextView mLocationAddress;
+    private CheckBox mPublicView;
+    private CheckBox mRestroomView;
+    private CheckBox mNoView;
+    private EditText mComment;
+    private Button mSendButton;
+
+    private Establishment establishment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,57 +53,53 @@ public class ReportActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final TextView mLocationName = (TextView)findViewById(R.id.location_name);
-        final TextView mLocationAddress = (TextView)findViewById(R.id.location_address);
-        Button mSendButton = (Button)findViewById(R.id.send_button);
+        mLocationName = (TextView)findViewById(R.id.location_name);
+        mLocationAddress = (TextView)findViewById(R.id.location_address);
+        mPublicView = (CheckBox)findViewById(R.id.publicview);
+        mRestroomView = (CheckBox)findViewById(R.id.restroomview);
+        mNoView = (CheckBox)findViewById(R.id.noview);
+        mComment = (EditText)findViewById(R.id.additional_comments);
+        mSendButton = (Button)findViewById(R.id.send_button);
+
+        establishment = (Establishment) getIntent().getExtras().get("establishment");
+
+        mLocationName.setText(establishment.getName());
+        mLocationAddress.setText(establishment.getAddress());
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        Bundle extras = getIntent().getExtras();
-        EID = extras.getString("EID");
 
-        DatabaseReference ref = mDatabase.child("establishment").child(EID);
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                mLocationName.setText(dataSnapshot.child("Name").getValue().toString());
-                mLocationAddress.setText(dataSnapshot.child("Address").getValue().toString());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendReport();
+                Report report = new Report();
+                report.setPlaceId(establishment.getId());
+                report.setDateVisited(new Date());
+                report.setVolunteerId(mAuth.getCurrentUser().getUid());
+                report.setPublic_view(mPublicView.isChecked());
+                report.setRestroom_view(mRestroomView.isChecked());
+                report.setNo_view(mNoView.isChecked());
+                report.setComment(mComment.getText().toString());
+
+                sendReport(report);
             }
         });
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    private void sendReport() {
-        String VID = mAuth.getCurrentUser().getUid();
-        boolean publicView = ((CheckBox)findViewById(R.id.publicview)).isChecked();
-        boolean restroomView = ((CheckBox)findViewById(R.id.restroomview)).isChecked();
-        boolean noView = ((CheckBox)findViewById(R.id.noview)).isChecked();
-        String comment = ((EditText)findViewById(R.id.additional_comments)).getText().toString();
-
-        Calendar calendar = Calendar.getInstance();
-
+    private void sendReport(Report report) {
         String key = mDatabase.child("report").push().getKey();
-        mDatabase.child("report").child(key).child("EID").setValue(EID);
-        mDatabase.child("report").child(key).child("VID").setValue(VID);
-        mDatabase.child("report").child(key).child("Public View").setValue(publicView);
-        mDatabase.child("report").child(key).child("Restroom View").setValue(restroomView);
-        mDatabase.child("report").child(key).child("No View").setValue(noView);
-        mDatabase.child("report").child(key).child("Comment").setValue(comment);
-        mDatabase.child("report").child(key).child("Datetime").setValue(calendar.getTime());
+        mDatabase.child("report").child(key).child("EID").setValue(report.getPlaceId());
+        mDatabase.child("report").child(key).child("VID").setValue(report.getVolunteerId());
+        mDatabase.child("report").child(key).child("Public View").setValue(report.isPublic_view());
+        mDatabase.child("report").child(key).child("Restroom View").setValue(report.isRestroom_view());
+        mDatabase.child("report").child(key).child("No View").setValue(report.isNo_view());
+        mDatabase.child("report").child(key).child("Comment").setValue(report.getComment());
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        mDatabase.child("report").child(key).child("Datetime").setValue(sdf.format(report.getDateVisited()));
 
 
         startActivity(new Intent(ReportActivity.this, MainActivity.class));

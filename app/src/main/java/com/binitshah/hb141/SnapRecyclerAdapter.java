@@ -1,11 +1,13 @@
 package com.binitshah.hb141;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -37,7 +39,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.ReyclerViewHolder> {
+class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.RecyclerViewHolder> {
 
     private LayoutInflater layoutInflater;
     private Context context;
@@ -53,13 +55,13 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Reycl
     }
 
     @Override
-    public ReyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View item = layoutInflater.inflate(R.layout.establishment_card, parent, false);
-        return new ReyclerViewHolder(item);
+        return new RecyclerViewHolder(item);
     }
 
     @Override
-    public void onBindViewHolder(final ReyclerViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerViewHolder holder, int position) {
         if(establishments.size() == position) {
             holder.specificEstablishmentView.setVisibility(View.GONE);
             holder.generalEstablishmentView.setVisibility(View.VISIBLE);
@@ -72,20 +74,20 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Reycl
                     Toast.makeText(context, "Generic Action", Toast.LENGTH_SHORT).show();
                 }
             });
-        }
-        else {
+        } else {
             final Establishment establishment = establishments.get(position);
 
             holder.specificEstablishmentView.setVisibility(View.VISIBLE);
             holder.generalEstablishmentView.setVisibility(View.GONE);
-
             holder.establishmentCardView.setCardBackgroundColor(Color.WHITE);
             holder.establishmentInspectButton.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
             holder.establishmentInspectButton.setTextColor(Color.WHITE);
             holder.establishmentInspectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(context, "ID: " + establishment.getId(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(context, ReportActivity.class);
+                    intent.putExtra("establishment", establishment);
+                    context.startActivity(intent);
                 }
             });
 
@@ -121,7 +123,7 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Reycl
         return establishments.size() + 1;
     }
 
-    class ReyclerViewHolder extends RecyclerView.ViewHolder {
+    class RecyclerViewHolder extends RecyclerView.ViewHolder {
         private ImageView establishmentBackground;
         private TextView establishmentAttribution;
         private Button establishmentInspectButton;
@@ -132,7 +134,7 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Reycl
         private RelativeLayout generalEstablishmentView;
         private Button generalEstablishInspectButton;
 
-        private ReyclerViewHolder(final View v) {
+        private RecyclerViewHolder(final View v) {
             super(v);
 
             establishmentBackground = (ImageView) v.findViewById(R.id.establishment_background);

@@ -1,10 +1,13 @@
 package com.binitshah.hb141;
 
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
 
@@ -14,18 +17,20 @@ import java.util.Locale;
  * NOTE: this is not the establishment class that gets updated to firebase. there is data here that isn't needed up there, and futhermore, the establishment in firebase needs ids of reports that have been filled out on that location
  */
 
-class Establishment {
+
+class Establishment implements Serializable {
     private String address;
     private String attributions;
     private String id;
-    private LatLng latLng;
+    private transient LatLng latLng;
     private Locale locale;
     private String name;
     private String phoneNumber;
     private List<Integer> placeTypes;
-    private LatLngBounds viewport;
-    private Uri websiteUri;
+    private transient LatLngBounds viewport;
+    private transient Uri websiteUri;
     private float likelihood;
+
 
     public Establishment(String address, String attributions, String id, LatLng latLng, Locale locale, String name, String phoneNumber, List<Integer> placeTypes, LatLngBounds viewport, Uri websiteUri, float likelihood) {
         this.address = address;
@@ -128,4 +133,5 @@ class Establishment {
     public void setLikelihood(float likelihood) {
         this.likelihood = likelihood;
     }
+
 }
