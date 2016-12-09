@@ -9,6 +9,7 @@
     android:background="@android:color/white">
 
     <RelativeLayout
+        android:id="@+id/specific_establishment"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -89,6 +90,36 @@
             android:textSize="20sp" />
             THIS IS TO BE USED WHEN WE IMPLEMENT THE FEATURE WHERE USERS CAN SEE WHETHER A PLACE HAS BEEN SURVEYED BEFORE
             -->
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/general_establishment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/establishment_general_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Is the establishment you're looking for not here? Fill out an empty form here."
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop="50dp"
+            android:textAlignment="center"
+            android:layout_centerHorizontal="true"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="15sp"/>
+
+        <Button
+            android:id="@+id/general_establishment_inspect_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/establishment_general_message"
+            android:layout_centerHorizontal="true"
+            android:text="Inspect" />
 
     </RelativeLayout>
 

@@ -1,13 +1,13 @@
 package com.binitshah.hb141;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,48 +60,65 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Reycl
 
     @Override
     public void onBindViewHolder(final ReyclerViewHolder holder, int position) {
-        final Establishment establishment = establishments.get(position);
-
-        holder.establishmentCardView.setCardBackgroundColor(Color.WHITE);
-        holder.establishmentInspectButton.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
-        holder.establishmentInspectButton.setTextColor(Color.WHITE);
-        holder.establishmentInspectButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        new DownloadPlacePhoto(holder.establishmentBackground, holder.establishmentAttribution).execute(establishment.getId());
-
-        holder.establishmentName.setText(establishment.getName());
-
-        String typesMessage = "";
-        List<Integer> establishmentTypes = establishment.getPlaceTypes();
-        Integer thirtyfour = new Integer(34);
-        establishmentTypes.remove(thirtyfour);
-        Integer thousandthirteen = new Integer(1013);
-        establishmentTypes.remove(thousandthirteen);
-        Integer zero = new Integer(0);
-        establishmentTypes.remove(zero);
-        int typesSize = establishmentTypes.size();
-
-        for(int i = 0; i < typesSize; i++) {
-            String tempHolder = PlaceType.convertConstantToString(establishmentTypes.get(i));
-            if((i+1) == typesSize){
-                typesMessage += tempHolder;
-            }
-            else {
-                typesMessage += tempHolder + " | ";
-            }
+        if(establishments.size() == position) {
+            holder.specificEstablishmentView.setVisibility(View.GONE);
+            holder.generalEstablishmentView.setVisibility(View.VISIBLE);
+            holder.establishmentCardView.setCardBackgroundColor(Color.WHITE);
+            holder.generalEstablishInspectButton.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
+            holder.generalEstablishInspectButton.setTextColor(Color.WHITE);
+            holder.generalEstablishInspectButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(context, "Generic Action", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
-        Log.d(TAG, "Message: " + typesMessage);
-        holder.establishmentTypes.setText(typesMessage);
+        else {
+            final Establishment establishment = establishments.get(position);
+
+            holder.specificEstablishmentView.setVisibility(View.VISIBLE);
+            holder.generalEstablishmentView.setVisibility(View.GONE);
+
+            holder.establishmentCardView.setCardBackgroundColor(Color.WHITE);
+            holder.establishmentInspectButton.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
+            holder.establishmentInspectButton.setTextColor(Color.WHITE);
+            holder.establishmentInspectButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(context, "ID: " + establishment.getId(), Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            new DownloadPlacePhoto(holder.establishmentBackground, holder.establishmentAttribution).execute(establishment.getId());
+
+            holder.establishmentName.setText(establishment.getName());
+
+            String typesMessage = "";
+            List<Integer> establishmentTypes = establishment.getPlaceTypes();
+            Integer thirtyfour = new Integer(34);
+            establishmentTypes.remove(thirtyfour);
+            Integer thousandthirteen = new Integer(1013);
+            establishmentTypes.remove(thousandthirteen);
+            Integer zero = new Integer(0);
+            establishmentTypes.remove(zero);
+            int typesSize = establishmentTypes.size();
+
+            for (int i = 0; i < typesSize; i++) {
+                String tempHolder = PlaceType.convertConstantToString(establishmentTypes.get(i));
+                if ((i + 1) == typesSize) {
+                    typesMessage += tempHolder;
+                } else {
+                    typesMessage += tempHolder + " | ";
+                }
+            }
+
+            holder.establishmentTypes.setText(typesMessage);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return establishments.size();
+        return establishments.size() + 1;
     }
 
     class ReyclerViewHolder extends RecyclerView.ViewHolder {
@@ -110,6 +128,9 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Reycl
         private TextView establishmentName;
         private TextView establishmentTypes;
         private CardView establishmentCardView;
+        private RelativeLayout specificEstablishmentView;
+        private RelativeLayout generalEstablishmentView;
+        private Button generalEstablishInspectButton;
 
         private ReyclerViewHolder(final View v) {
             super(v);
@@ -120,6 +141,9 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Reycl
             establishmentName = (TextView) v.findViewById(R.id.establishment_name);
             establishmentTypes = (TextView) v.findViewById(R.id.establishment_types);
             establishmentCardView = (CardView) v.findViewById(R.id.establishment_cardview);
+            specificEstablishmentView = (RelativeLayout) v.findViewById(R.id.specific_establishment);
+            generalEstablishmentView = (RelativeLayout) v.findViewById(R.id.general_establishment);
+            generalEstablishInspectButton = (Button) v.findViewById(R.id.general_establishment_inspect_button);
         }
     }
 

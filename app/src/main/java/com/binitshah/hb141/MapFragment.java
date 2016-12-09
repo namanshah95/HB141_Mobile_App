@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -53,6 +54,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,6 +78,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
     ArrayList<Establishment> establishments = new ArrayList<>();
     private ProgressDialog pDialog;
     private RecyclerView establishment_rv;
+    private LinearLayoutManager llm;
 
     //Places API
     protected GoogleApiClient mGoogleApiClient;
@@ -215,12 +218,35 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
         establishment_rv.setHasFixedSize(true);
         SnapHelper snapHelper = new LinearSnapHelper();
         snapHelper.attachToRecyclerView(establishment_rv);
-        establishment_rv.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+        llm = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+        establishment_rv.setLayoutManager(llm);
 
         SnapRecyclerAdapter adapter = new SnapRecyclerAdapter(context, establishments, mGoogleApiClient);
         establishment_rv.setAdapter(adapter);
 
+
+        establishment_rv.addOnChildAttachStateChangeListener(new RecyclerView.OnChildAttachStateChangeListener() {
+            @Override
+            public void onChildViewAttachedToWindow(View view) {}
+
+            @Override
+            public void onChildViewDetachedFromWindow(View view) {
+                Handler handler = new Handler();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateMap(llm.findLastVisibleItemPosition());
+                    }
+                });
+            }
+        });
+
         pDialog.dismiss();
+    }
+
+    private void updateMap(int visibleEstablishment) {
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(establishments.get(visibleEstablishment).getViewport(), 0));
+        googleMap.addMarker(new MarkerOptions().position(establishments.get(visibleEstablishment).getLatLng()));
     }
 
     @Override
