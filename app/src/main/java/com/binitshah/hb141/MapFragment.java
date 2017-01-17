@@ -235,7 +235,8 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        updateMap(llm.findLastVisibleItemPosition());
+                        //updateMap(llm.findLastVisibleItemPosition());
+                        Log.d(TAG, "Cardview Position: " + llm.findLastVisibleItemPosition());
                     }
                 });
             }

@@ -9,8 +9,10 @@ import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.LruCache;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -46,12 +48,34 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Recyc
     private ArrayList<Establishment> establishments;
     GoogleApiClient mGoogleApiClient;
     private static final String TAG = "HB141Log";
+    private LruCache<String, Bitmap> mMemoryCache;
 
     public SnapRecyclerAdapter(Context context, ArrayList<Establishment> establishments, GoogleApiClient mGoogleApiClient) {
         this.layoutInflater = LayoutInflater.from(context);
         this.context = context;
         this.establishments = establishments;
         this.mGoogleApiClient = mGoogleApiClient;
+
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int cacheSize = maxMemory / 2;
+        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in kilobytes rather than
+                // number of items.
+                return bitmap.getByteCount() / 1024;
+            }
+        };
+    }
+
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null  && bitmap != null) {
+            mMemoryCache.put(key, bitmap);
+        }
+    }
+
+    public Bitmap getBitmapFromMemCache(String key) {
+        return mMemoryCache.get(key);
     }
 
     @Override
@@ -66,8 +90,7 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Recyc
             holder.specificEstablishmentView.setVisibility(View.GONE);
             holder.generalEstablishmentView.setVisibility(View.VISIBLE);
             holder.establishmentCardView.setCardBackgroundColor(Color.WHITE);
-            holder.generalEstablishInspectButton.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
-            holder.generalEstablishInspectButton.setTextColor(Color.WHITE);
+            //holder.generalEstablishInspectButton.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
             holder.generalEstablishInspectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -79,19 +102,18 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Recyc
 
             holder.specificEstablishmentView.setVisibility(View.VISIBLE);
             holder.generalEstablishmentView.setVisibility(View.GONE);
-            holder.establishmentCardView.setCardBackgroundColor(Color.WHITE);
-            holder.establishmentInspectButton.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
-            holder.establishmentInspectButton.setTextColor(Color.WHITE);
+            holder.establishmentCardView.setCardBackgroundColor(Color.WHITE); //todo: change color to something using the name here and then set background image to transparent if no image is found.
+            //holder.establishmentInspectButton.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.colorAccent), PorterDuff.Mode.SRC_ATOP);
             holder.establishmentInspectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(context, ReportActivity.class);
+                    /*Intent intent = new Intent(context, ReportActivity.class);
                     intent.putExtra("establishment", establishment);
-                    context.startActivity(intent);
+                    context.startActivity(intent);*/
                 }
             });
 
-            new DownloadPlacePhoto(holder.establishmentBackground, holder.establishmentAttribution).execute(establishment.getId());
+            loadBackgroundImage(establishment, holder.establishmentBackground, holder.establishmentAttribution);
 
             holder.establishmentName.setText(establishment.getName());
 
@@ -118,6 +140,25 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Recyc
         }
     }
 
+    public void loadBackgroundImage(Establishment establishment, ImageView background, TextView attribution) {
+        final Bitmap bitmap = getBitmapFromMemCache(establishment.getId());
+
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int usedMemory = (int) ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024);
+        final float percentage = (float) usedMemory / (float) maxMemory;
+        Log.d(TAG, "Total Memory: " + maxMemory + " | Used Memory: " + usedMemory + " | Percentage used: " + percentage);
+
+        if(bitmap != null) {
+            Log.d(TAG, "Pulling from cache for " + establishment.getName());
+            background.setVisibility(View.VISIBLE);
+            background.setImageBitmap(bitmap);
+            attribution.setText(establishment.getAttributions());
+        } else {
+            Log.d(TAG, "Pulling from online for " + establishment.getName());
+            new DownloadPlacePhoto(establishment, background, attribution).execute(establishment.getId());
+        }
+    }
+
     @Override
     public int getItemCount() {
         return establishments.size() + 1;
@@ -126,42 +167,44 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Recyc
     class RecyclerViewHolder extends RecyclerView.ViewHolder {
         private ImageView establishmentBackground;
         private TextView establishmentAttribution;
-        private Button establishmentInspectButton;
+        private FloatingActionButton establishmentInspectButton;
         private TextView establishmentName;
         private TextView establishmentTypes;
         private CardView establishmentCardView;
         private RelativeLayout specificEstablishmentView;
         private RelativeLayout generalEstablishmentView;
-        private Button generalEstablishInspectButton;
+        private FloatingActionButton generalEstablishInspectButton;
 
         private RecyclerViewHolder(final View v) {
             super(v);
 
             establishmentBackground = (ImageView) v.findViewById(R.id.establishment_background);
             establishmentAttribution = (TextView) v.findViewById(R.id.establishment_attribution);
-            establishmentInspectButton = (Button) v.findViewById(R.id.establishment_inspect_button);
+            establishmentInspectButton = (FloatingActionButton) v.findViewById(R.id.establishment_inspect_button);
             establishmentName = (TextView) v.findViewById(R.id.establishment_name);
             establishmentTypes = (TextView) v.findViewById(R.id.establishment_types);
             establishmentCardView = (CardView) v.findViewById(R.id.establishment_cardview);
             specificEstablishmentView = (RelativeLayout) v.findViewById(R.id.specific_establishment);
             generalEstablishmentView = (RelativeLayout) v.findViewById(R.id.general_establishment);
-            generalEstablishInspectButton = (Button) v.findViewById(R.id.general_establishment_inspect_button);
+            generalEstablishInspectButton = (FloatingActionButton) v.findViewById(R.id.general_establishment_inspect_button);
         }
     }
 
-    private class DownloadPlacePhoto extends AsyncTask<String, Void, DownloadPlacePhoto.AttributedPhoto> {
+    private class DownloadPlacePhoto extends AsyncTask<String, Void, Bitmap> {
+        Establishment establishment;
         ImageView establishment_background;
         TextView establishment_attribution;
         String placeId;
 
-        DownloadPlacePhoto(ImageView establishment_background_holder, TextView establishment_attribution_holder) {
+        DownloadPlacePhoto(Establishment establishment, ImageView establishment_background_holder, TextView establishment_attribution_holder) {
+            this.establishment = establishment;
             this.establishment_background = establishment_background_holder;
             this.establishment_attribution = establishment_attribution_holder;
         }
 
-        protected AttributedPhoto doInBackground(String... urls) {
-            placeId = urls[0];
-            AttributedPhoto downloadedPlacePhoto = null;
+        protected Bitmap doInBackground(String... placeIds) {
+            placeId = placeIds[0];
+            Bitmap downloadedPlaceBitmap = null;
 
             PlacePhotoMetadataResult result = Places.GeoDataApi
                     .getPlacePhotos(mGoogleApiClient, placeId).await();
@@ -169,45 +212,47 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Recyc
             if (result.getStatus().isSuccess()) {
                 PlacePhotoMetadataBuffer photoMetadataBuffer = result.getPhotoMetadata();
                 if (photoMetadataBuffer.getCount() > 0 && !isCancelled()) {
-                    // Get the first bitmap and its attributions.
+                    //Get photo
                     PlacePhotoMetadata photo = photoMetadataBuffer.get(0);
+                    //get attribution and set it to establishment
                     CharSequence attribution = photo.getAttributions();
-                    // Load a scaled bitmap for this photo.
-                    Bitmap image = photo.getPhoto(mGoogleApiClient).await().getBitmap();
+                    if(attribution != null) {
+                        //process it to our standards for attribution. none of that html link bs
+                        String raw = attribution.toString();
+                        raw = raw.substring(raw.indexOf(">") + 1, raw.indexOf("</"));
+                        raw = "Photo by " + raw;
+                        establishment.setAttributions(raw);
+                    } else {
+                        establishment.setAttributions(null);
+                    }
 
-                    downloadedPlacePhoto = new AttributedPhoto(attribution, image);
+                    // Load a scaled bitmap for this photo.
+                    downloadedPlaceBitmap = photo.getPhoto(mGoogleApiClient).await().getBitmap();
                 }
                 // Release the PlacePhotoMetadataBuffer.
                 photoMetadataBuffer.release();
             }
 
-            return downloadedPlacePhoto;
+            addBitmapToMemoryCache(establishment.getId(), downloadedPlaceBitmap);
+            return downloadedPlaceBitmap;
         }
 
-        protected void onPostExecute(AttributedPhoto result) {
+        protected void onPostExecute(Bitmap result) {
+            //handle the background image
             if(result != null) {
-                establishment_background.setImageBitmap(result.bitmap);
-                if (result.attribution == null) {
-                    establishment_attribution.setVisibility(View.GONE);
-                }
-                else {
-                    establishment_attribution.setVisibility(View.VISIBLE);
-                    String attributionMessage = result.attribution.toString();
-                    attributionMessage = attributionMessage.substring(attributionMessage.indexOf(">") + 1, attributionMessage.indexOf("</"));
-                    attributionMessage = "Photo by " + attributionMessage;
-                    Log.d(TAG, "Attribution: " + attributionMessage);
-                    establishment_attribution.setText(attributionMessage);
-                }
+                establishment_background.setVisibility(View.VISIBLE);
+                establishment_background.setImageBitmap(result);
+            } else {
+                establishment_background.setVisibility(View.GONE);
             }
-        }
 
-        class AttributedPhoto {
-            final CharSequence attribution;
-            final Bitmap bitmap;
-
-            AttributedPhoto(CharSequence attribution, Bitmap bitmap) {
-                this.attribution = attribution;
-                this.bitmap = bitmap;
+            //handle the attribution text
+            if (establishment.getAttributions() == null) {
+                establishment_attribution.setVisibility(View.GONE);
+            }
+            else {
+                establishment_attribution.setVisibility(View.VISIBLE);
+                establishment_attribution.setText(establishment.getAttributions());
             }
         }
     }
