@@ -107,10 +107,10 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Recyc
             holder.establishmentInspectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    /*Intent intent = new Intent(context, ReportActivity.class);
+                    Intent intent = new Intent(context, ReportActivity.class);
                     intent.putExtra("establishment", establishment);
-                    context.startActivity(intent);*/
-                    Toast.makeText(context, establishment.getName(), Toast.LENGTH_SHORT).show();
+                    context.startActivity(intent);
+                    //Toast.makeText(context, establishment.getName(), Toast.LENGTH_SHORT).show();
                 }
             });
 

@@ -289,6 +289,34 @@ public class MainActivity extends AppCompatActivity
             if (resultCode == RESULT_OK) {
                 place = PlaceAutocomplete.getPlace(this, data);
                 Log.d(TAG, "Place data: " + place + " | " + place.getId() + place.getAddress());
+                String address = null;
+                String attributions = null;
+                String phoneNumber = null;
+                if(place.getAddress() != null) {
+                    address = place.getAddress().toString();
+                }
+                if(place.getAttributions() != null) {
+                    attributions = place.getAttributions().toString();
+                }
+                if(place.getPhoneNumber() != null) {
+                    phoneNumber = place.getPhoneNumber().toString();
+                }
+                Establishment establishment = new Establishment(
+                        address,
+                        attributions,
+                        place.getId(),
+                        place.getLatLng(),
+                        place.getLocale(),
+                        place.getName().toString(),
+                        phoneNumber,
+                        place.getPlaceTypes(),
+                        place.getViewport(),
+                        place.getWebsiteUri(),
+                        (float) 1.0
+                );
+                Intent intent = new Intent(context, ReportActivity.class);
+                intent.putExtra("establishment", establishment);
+                context.startActivity(intent);
             }
         } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
             Status status = PlaceAutocomplete.getStatus(this, data);
