@@ -34,15 +34,15 @@
             android:fontFamily="san-serif-light"
             android:layout_margin="5dp"/>
 
-        <android.support.design.widget.FloatingActionButton
+        <ImageView
             android:id="@+id/establishment_inspect_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fabSize="mini"
-            android:src="@drawable/ic_search_24dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/searchfab"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:layout_margin="15dp" />
+            android:layout_margin="5dp"
+            android:contentDescription="Inspect" />
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -79,21 +79,6 @@
 
         </RelativeLayout>
 
-        <!--
-        <TextView
-            android:id="@+id/establishment_previous_report_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Example Name"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-black"
-            android:textSize="20sp" />
-            THIS IS TO BE USED WHEN WE IMPLEMENT THE FEATURE WHERE USERS CAN SEE WHETHER A PLACE HAS BEEN SURVEYED BEFORE
-            -->
-
     </RelativeLayout>
 
     <RelativeLayout
@@ -116,15 +101,15 @@
             android:fontFamily="sans-serif-medium"
             android:textSize="15sp"/>
 
-        <android.support.design.widget.FloatingActionButton
+        <ImageView
             android:id="@+id/general_establishment_inspect_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/searchfab"
             android:layout_marginTop="10dp"
-            app:fabSize="normal"
-            android:src="@drawable/ic_search_24dp"
             android:layout_below="@+id/establishment_general_message"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:contentDescription="General Inspect" />
 
     </RelativeLayout>
 
