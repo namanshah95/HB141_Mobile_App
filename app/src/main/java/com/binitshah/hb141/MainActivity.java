@@ -230,10 +230,6 @@ public class MainActivity extends AppCompatActivity
                 toolbar.setTitle(getResources().getString(R.string.nav_settings_string));
                 fragment = new SettingsFragment();
                 break;
-            case R.id.nav_signout_id:
-                hideMenu = true;
-                mAuth.signOut();
-                startActivity(new Intent(this, MainActivity.class));
         }
 
         /*
