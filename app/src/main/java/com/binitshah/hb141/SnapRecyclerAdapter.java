@@ -162,7 +162,7 @@ class SnapRecyclerAdapter extends RecyclerView.Adapter<SnapRecyclerAdapter.Recyc
 
     @Override
     public int getItemCount() {
-        return establishments.size() + 1;
+        return establishments.size(); // add +1 to bring back generic
     }
 
     class RecyclerViewHolder extends RecyclerView.ViewHolder {

@@ -28,11 +28,11 @@ class Establishment implements Serializable {
     private String phoneNumber;
     private List<Integer> placeTypes;
     private transient LatLngBounds viewport;
-    private transient Uri websiteUri;
+    private String websiteUri;
     private float likelihood;
 
 
-    public Establishment(String address, String attributions, String id, LatLng latLng, Locale locale, String name, String phoneNumber, List<Integer> placeTypes, LatLngBounds viewport, Uri websiteUri, float likelihood) {
+    public Establishment(String address, String attributions, String id, LatLng latLng, Locale locale, String name, String phoneNumber, List<Integer> placeTypes, LatLngBounds viewport, String websiteUri, float likelihood) {
         this.address = address;
         this.attributions = attributions;
         this.id = id;
@@ -118,11 +118,11 @@ class Establishment implements Serializable {
         this.viewport = viewport;
     }
 
-    public Uri getWebsiteUri() {
+    public String getWebsiteUri() {
         return websiteUri;
     }
 
-    public void setWebsiteUri(Uri websiteUri) {
+    public void setWebsiteUri(String websiteUri) {
         this.websiteUri = websiteUri;
     }
 

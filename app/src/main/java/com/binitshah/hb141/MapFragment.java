@@ -157,9 +157,10 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                     for (PlaceLikelihood placeLikelihood : placeLikelihoods) {
                         Log.d(TAG, "unsorted:" + placeLikelihood.getPlace().getName() + " | " + placeLikelihood.getLikelihood());
                         Place place = placeLikelihood.getPlace();
-                        String address = null;
-                        String attributions = null;
-                        String phoneNumber = null;
+                        String address = "";
+                        String attributions = "";
+                        String phoneNumber = "";
+                        String url = "";
                         if(place.getAddress() != null) {
                             address = place.getAddress().toString();
                         }
@@ -168,6 +169,9 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                         }
                         if(place.getPhoneNumber() != null) {
                             phoneNumber = place.getPhoneNumber().toString();
+                        }
+                        if(place.getWebsiteUri() != null) {
+                            url = place.getWebsiteUri().toString();
                         }
 
                         Establishment establishment = new Establishment(
@@ -180,7 +184,7 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                                 phoneNumber,
                                 place.getPlaceTypes(),
                                 place.getViewport(),
-                                place.getWebsiteUri(),
+                                url,
                                 placeLikelihood.getLikelihood()
                         );
                         establishments.add(establishment);
@@ -235,18 +239,26 @@ public class MapFragment extends Fragment implements GoogleApiClient.ConnectionC
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        //updateMap(llm.findLastVisibleItemPosition());
+                        if(llm.findLastVisibleItemPosition() < establishments.size()) {
+                            updateMap(llm.findLastVisibleItemPosition());
+                        }
                         Log.d(TAG, "Cardview Position: " + llm.findLastVisibleItemPosition());
                     }
                 });
             }
         });
-
+        updateMap(0);
         pDialog.dismiss();
     }
 
     private void updateMap(int visibleEstablishment) {
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(establishments.get(visibleEstablishment).getViewport(), 0));
+        googleMap.clear();
+        if (establishments.get(visibleEstablishment).getViewport() != null) {
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(establishments.get(visibleEstablishment).getViewport(), 0));
+        }
+        else {
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(establishments.get(visibleEstablishment).getLatLng(), 6));
+        }
         googleMap.addMarker(new MarkerOptions().position(establishments.get(visibleEstablishment).getLatLng()));
     }
 

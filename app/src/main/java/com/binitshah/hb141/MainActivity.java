@@ -289,9 +289,10 @@ public class MainActivity extends AppCompatActivity
             if (resultCode == RESULT_OK) {
                 place = PlaceAutocomplete.getPlace(this, data);
                 Log.d(TAG, "Place data: " + place + " | " + place.getId() + place.getAddress());
-                String address = null;
-                String attributions = null;
-                String phoneNumber = null;
+                String address = "";
+                String attributions = "";
+                String phoneNumber = "";
+                String url = "";
                 if(place.getAddress() != null) {
                     address = place.getAddress().toString();
                 }
@@ -300,6 +301,9 @@ public class MainActivity extends AppCompatActivity
                 }
                 if(place.getPhoneNumber() != null) {
                     phoneNumber = place.getPhoneNumber().toString();
+                }
+                if (place.getWebsiteUri() != null) {
+                    url = place.getWebsiteUri().toString();
                 }
                 Establishment establishment = new Establishment(
                         address,
@@ -311,7 +315,7 @@ public class MainActivity extends AppCompatActivity
                         phoneNumber,
                         place.getPlaceTypes(),
                         place.getViewport(),
-                        place.getWebsiteUri(),
+                        url,
                         (float) 1.0
                 );
                 Intent intent = new Intent(context, ReportActivity.class);

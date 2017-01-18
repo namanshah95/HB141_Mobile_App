@@ -53,6 +53,9 @@ public class ReportActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
         mLocationName = (TextView)findViewById(R.id.location_name);
         mLocationAddress = (TextView)findViewById(R.id.location_address);
         mPublicView = (CheckBox)findViewById(R.id.publicview);
@@ -63,13 +66,17 @@ public class ReportActivity extends AppCompatActivity {
 
         establishment = (Establishment) getIntent().getExtras().get("establishment");
 
+        mDatabase.child("establishment").child(establishment.getId()).child("Name").setValue(establishment.getName());
+        mDatabase.child("establishment").child(establishment.getId()).child("Address").setValue(establishment.getAddress());
+        mDatabase.child("establishment").child(establishment.getId()).child("Phone Number").setValue(establishment.getPhoneNumber());
+        mDatabase.child("establishment").child(establishment.getId()).child("Website").setValue(establishment.getWebsiteUri());
+        for (int i = 0; i < establishment.getPlaceTypes().size(); i++) {
+            mDatabase.child("establishment").child(establishment.getId()).child("Place Type").child(Integer.valueOf(i).toString())
+                    .setValue(establishment.getPlaceTypes().get(i));
+        }
+
         mLocationName.setText(establishment.getName());
         mLocationAddress.setText(establishment.getAddress());
-
-        mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-
-
 
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
